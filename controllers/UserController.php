@@ -38,7 +38,7 @@ class UserController
 
                 $stmt->execute();
 
-                // Redirecionar o usuário para a página de login ou painel de controle após o registro bem-sucedido
+
                 header('Location: /login');
             } else {
                 $_SESSION['errors'] = $errors;
@@ -68,10 +68,10 @@ class UserController
 
 
             if ($user && password_verify($password, $user['password_hash'])) {
-                // iniciar a sessão
+
                 session_start();
                 $_SESSION['user'] = $user;
-                // redirecionar para a página inicial
+
                 header('Location: /');
                 exit;
             } else {
@@ -142,7 +142,7 @@ class UserController
             $existingEmail = $stmt->fetch();
 
             if ($existingEmail) {
-                // O novo e-mail já existe, retorna uma mensagem de erro
+
                 Session::setFlashMessage('email', 'Este e-mail já está em uso.');
                 header('Location: /profile');
                 exit();

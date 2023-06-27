@@ -9,7 +9,9 @@
 
 
 <main>
+
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+        <a href="/league?id=<?= $game['id_liga'] ?>">Voltar</a>
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -60,11 +62,13 @@
                 <?php endif; ?>
             <?php endif; ?>
 
-            <?php if ($game['status'] == GAME_LOCKED): ?>
+
+            <?php if ($game['status'] == GAME_LOCKED && !$resultsExist): ?>
                 <a href="/game/register_results?id=<?php echo $game['id']; ?>" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Registrar Resultados</a>
             <?php else: ?>
                 <div class="cursor-not-allowed opacity-50">Registrar Resultados</div>
             <?php endif; ?>
+
 
             <?php if ($game['status'] == GAME_LOCKED && $resultsExist): ?>
                 <form action="/game/finish" method="POST">

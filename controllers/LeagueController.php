@@ -12,7 +12,8 @@ class LeagueController
             $id_criador = $_SESSION['user']['id'];
             $data_criacao = date("Y-m-d H:i:s");
 
-            // Gerar um código de convite único para a liga
+            // generate an invite code
+            // TODO: need to make sure later that it's not a repeated
             $invite_code = self::generateRandomInviteCode();
 
             if (empty($name) || empty($description)) {
@@ -30,23 +31,23 @@ class LeagueController
             $stmt->bindParam(':invite_code', $invite_code); // Adicione o código de convite na inserção da liga
             $stmt->execute();
 
-            // Obtendo o ID da liga que acabamos de inserir
+            // id of just added league
             $liga_id = $conn->lastInsertId();
 
-            // Inserir o criador da liga como membro na tabela Membros_Liga
+            // inser league creator as member of the league
             $stmt = $conn->prepare('INSERT INTO Membros_Liga (id_utilizador, id_liga, admin) VALUES (:id_utilizador, :id_liga, :admin)');
             $stmt->bindParam(':id_utilizador', $id_criador);
             $stmt->bindParam(':id_liga', $liga_id);
-            $stmt->bindValue(':admin', 1);  // Como o usuário é o criador da liga, ele será um admin
+            $stmt->bindValue(':admin', 1);  // 1 for admin 0 for user
             $stmt->execute();
 
-            header('Location: /dashboard'); // depois alterar para a nova liga criada quando essa view estiver a funcionar
+            header('Location: /dashboard');
         }
 
         require_once '../views/liga/league_create.php';
     }
 
-// Função para gerar o código de convite aleatório
+
     public static function generateRandomInviteCode($length = 5) {
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -109,6 +110,8 @@ class LeagueController
             //Get the league rankings
             $ranking = self::getPlayerRankings($league_id);
 
+
+
             require_once '../views/liga/league.php';
         } else {
             header('Location: /error');
@@ -125,10 +128,10 @@ class LeagueController
 
     }
     public static function lastGames($league_id){
-
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT * FROM Jogos WHERE id_liga = :league_id ORDER BY data_hora DESC LIMIT 5');
+        $stmt = $conn->prepare('SELECT * FROM Jogos WHERE id_liga = :league_id AND status = :game_status ORDER BY data_hora DESC LIMIT 5');
         $stmt->bindParam(':league_id', $league_id);
+        $stmt->bindValue(':game_status', 0);
         $stmt->execute();
         $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -137,19 +140,20 @@ class LeagueController
             $game['players'] = $players;
         }
 
-        return $game;
+        return $games;
     }
+
 
     public static function isUserMemberOfLeague($user_id, $league_id)
     {
-        // Consulte a base de dados para verificar se o usuário é um membro da liga
+
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT * FROM Membros_Liga WHERE id_utilizador = :user_id AND id_liga = :league_id');
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
         $membership = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $membership != false;  // retorna true se o usuário for membro, false caso contrário
+        return $membership != false;  // return true if its a member, false otherwise
     }
     public static function getLeagueInfo($league_id) {
         $conn = dbConnect();
@@ -197,12 +201,10 @@ class LeagueController
 
     public static function getPlayerRankings($league_id) {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT Jogadores_Jogo.id_utilizador, Utilizadores.nome_utilizador, SUM(Jogadores_Jogo.pontuacao) as total_pontuacao FROM Jogadores_Jogo 
-    JOIN Jogos ON Jogadores_Jogo.id_jogo = Jogos.id
-    JOIN Utilizadores ON Jogadores_Jogo.id_utilizador = Utilizadores.id
-    WHERE Jogos.id_liga = :league_id AND Jogos.status = "realizado"
-    GROUP BY Jogadores_Jogo.id_utilizador
-    ORDER BY total_pontuacao DESC');
+        $stmt = $conn->prepare('SELECT Ranking.id_utilizador, Utilizadores.nome_utilizador, Ranking.pontos as total_pontuacao, Ranking.jogos_jogados FROM Ranking
+JOIN Utilizadores ON Ranking.id_utilizador = Utilizadores.id
+WHERE Ranking.id_liga = :league_id 
+ORDER BY total_pontuacao DESC');
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -210,20 +212,20 @@ class LeagueController
 
 
 
+
     public static function joinLeague() {
-        // Verificando o método da requisição HTTP
+
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-            // Se for GET, mostrar o formulário para o usuário
-            require_once '../views/league/join_form.php';
+            require_once '../views/liga/join.php';
         }
         else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Se for POST, processar a adesão à liga
+
             $invite_code = $_POST['invite_code'];
 
-            // Conectando ao banco de dados
+
             $conn = dbConnect();
 
-            // Buscando o id da liga através do código de convite
+
             $stmt = $conn->prepare("SELECT id FROM Ligas WHERE codigo_convite = :invite_code");
             $stmt->bindParam(':invite_code', $invite_code);
             $stmt->execute();
@@ -231,7 +233,8 @@ class LeagueController
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$result) {
-                // Se o código de convite não for válido, redirecionar o usuário de volta ao formulário com uma mensagem de erro
+                // if invite not valid
+                // TODO: deal with error messages
                 Session::setFlashMessage('league_join_error', 'Código de convite inválido');
                 header('Location: /league/join');
                 exit();
@@ -240,14 +243,20 @@ class LeagueController
             $league_id = $result['id'];
             $user_id = $_SESSION['user']['id'];
 
-            // Adicionando o usuário à liga
+            // adding user to the league
             $stmt = $conn->prepare("INSERT INTO Membros_Liga (id_utilizador, id_liga) VALUES (:user_id, :league_id)");
             $stmt->bindParam(':user_id', $user_id);
             $stmt->bindParam(':league_id', $league_id);
             $stmt->execute();
 
-            // Redirecionando o usuário para a página da liga
-            header("Location: /league/show?league_id=$league_id");
+            // adding user to league ranking with all 0
+            $stmt = $conn->prepare("INSERT INTO Ranking (id_utilizador, id_liga, pontos, jogos_jogados, jogos_ganhos, jogos_perdidos) 
+                                VALUES (:user_id, :league_id, 0, 0, 0, 0)");
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->bindParam(':league_id', $league_id);
+            $stmt->execute();
+
+            header("Location: /league?id=$league_id");
         }
     }
 

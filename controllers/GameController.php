@@ -31,7 +31,7 @@ class GameController
 
             $local = $_POST['local'];
             $data_hora = $_POST['data_hora'];
-            // ...
+
 
             // Insert the new game into the database
             $conn = dbConnect();
@@ -57,6 +57,7 @@ class GameController
             require_once "../views/jogo/create.php";
         } else {
             // If the form is not submitted or the league_id is not set, redirect to the error page
+            // need to deal with error messages later ... remember
             header('Location: /error');
         }
     }
@@ -65,9 +66,8 @@ class GameController
     public static function show()
     {
 
-        // Get the game ID from the GET parameters
         $game_id = $_GET['id'];
-        $currentUserId = $_SESSION['user']['id']; // assuming user id is stored in session
+        $currentUserId = $_SESSION['user']['id'];
 
         // Query the database for the game with the given ID
         $conn = dbConnect();
@@ -97,6 +97,7 @@ class GameController
             require_once '../views/jogo/show.php';
         } else {
             // If the game was not found or the user is not a member of the league, redirect to the error page
+            // remember error messages
             header('Location: /error');
         }
     }
@@ -112,9 +113,7 @@ class GameController
                             ORDER BY Jogadores_Jogo.equipa ASC');
         $stmt->bindValue(':game_id', $game_id, PDO::PARAM_INT);
         $stmt->execute();
-        $players = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return $players;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
 
@@ -137,7 +136,6 @@ class GameController
 
     public static function subscribe()
     {
-        // Check if the request is a POST request
         $game_id = $_GET['id'];
 
         // Check if the user is logged in
@@ -226,19 +224,21 @@ class GameController
             // Only proceed if the correct number of players is subscribed
             if (count($players) == MAX_PLAYERS) {
                 // Assign the players to teams
-                for ($i = 0; $i < MAX_PLAYERS / 2; $i++) {
-                    $team1Player = $players[$i]; // Player with higher ranking
-                    $team2Player = $players[MAX_PLAYERS - 1 - $i]; // Player with lower ranking
+                for ($i = 0; $i < MAX_PLAYERS; $i++) {
+                    $currentPlayer = $players[$i]; // Current player
 
-                    // Assign the higher-ranked player to team 1
-                    $stmt = $conn->prepare('UPDATE Jogadores_Jogo SET equipa = 1 WHERE id_utilizador = :user_id AND id_jogo = :game_id');
-                    $stmt->bindParam(':user_id', $team1Player['id_utilizador']);
-                    $stmt->bindParam(':game_id', $game_id);
-                    $stmt->execute();
+                    // Determine the team for the player
+                    $team = 0;
+                    if ($i == 0 || $i == 3) { // 1st and 4th strongest players
+                        $team = 1;
+                    } else { // 2nd and 3rd strongest players
+                        $team = 2;
+                    }
 
-                    // Assign the lower-ranked player to team 2
-                    $stmt = $conn->prepare('UPDATE Jogadores_Jogo SET equipa = 2 WHERE id_utilizador = :user_id AND id_jogo = :game_id');
-                    $stmt->bindParam(':user_id', $team2Player['id_utilizador']);
+                    // Assign the player to the team
+                    $stmt = $conn->prepare('UPDATE Jogadores_Jogo SET equipa = :team WHERE id_utilizador = :user_id AND id_jogo = :game_id');
+                    $stmt->bindParam(':user_id', $currentPlayer['id_utilizador']);
+                    $stmt->bindParam(':team', $team);
                     $stmt->bindParam(':game_id', $game_id);
                     $stmt->execute();
                 }
@@ -321,10 +321,9 @@ class GameController
         $team1_score = $result['team1_score'];
         $team2_score = $result['team2_score'];
 
-        // Se qualquer um dos resultados for NULL, então os resultados ainda não foram inseridos
-        return !is_null($team1_score) && !is_null($team2_score);
+        // Se qualquer um dos resultados for NULL ou 0, então os resultados ainda não foram inseridos
+        return (!is_null($team1_score) && $team1_score != 0) && (!is_null($team2_score) && $team2_score != 0);
     }
-
 
     public static function finishGame()
     {
@@ -337,17 +336,14 @@ class GameController
 
         $conn = dbConnect();
 
-        // Buscar o resultado do jogo
+        // Search for game score
         $stmt = $conn->prepare('SELECT team1_score, team2_score FROM Jogos WHERE id = :id_jogo');
         $stmt->bindParam(':id_jogo', $id_jogo);
         $stmt->execute();
 
         $game_scores = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Determinar a equipe vencedora
-        $team_winner = $game_scores['team1_score'] > $game_scores['team2_score'] ? 1 : 2;
-
-        // Verificar primeiro se o jogo já terminou
+        // check if game ended
         $stmt = $conn->prepare('SELECT status FROM Jogos WHERE id = :id_jogo');
         $stmt->bindParam(':id_jogo', $id_jogo);
         $stmt->execute();
@@ -359,13 +355,13 @@ class GameController
             return;
         }
 
-        // Determinar a equipe vencedora
+        // winning team
         $team_winner = $game_scores['team1_score'] > $game_scores['team2_score'] ? 1 : 2;
 
-        // Determinar a equipe perdedora
+        // loosing team
         $team_loser = ($team_winner == 1) ? 2 : 1;
 
-        // Buscar os jogadores da equipe vencedora
+        // winning team players
         $stmt = $conn->prepare('SELECT id_utilizador FROM Jogadores_Jogo WHERE id_jogo = :id_jogo AND equipa = :team_winner');
         $stmt->bindParam(':id_jogo', $id_jogo);
         $stmt->bindParam(':team_winner', $team_winner);
@@ -373,15 +369,17 @@ class GameController
 
         $winning_players = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Para cada jogador na equipe vencedora, atualizar seus pontos, jogos_jogados e jogos_ganhos
+        // uupdate winning team score
         foreach ($winning_players as $player) {
+
             $stmt = $conn->prepare('UPDATE Ranking SET pontos = pontos + 1, jogos_jogados = jogos_jogados + 1, jogos_ganhos = jogos_ganhos + 1 WHERE id_utilizador = :id_utilizador AND id_liga = (SELECT id_liga FROM Jogos WHERE id = :id_jogo)');
             $stmt->bindParam(':id_utilizador', $player['id_utilizador']);
             $stmt->bindParam(':id_jogo', $id_jogo);
             $stmt->execute();
+
         }
 
-        // Buscar os jogadores da equipe perdedora
+        // loosing team players
         $stmt = $conn->prepare('SELECT id_utilizador FROM Jogadores_Jogo WHERE id_jogo = :id_jogo AND equipa = :team_loser');
         $stmt->bindParam(':id_jogo', $id_jogo);
         $stmt->bindParam(':team_loser', $team_loser);
@@ -389,7 +387,7 @@ class GameController
 
         $losing_players = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Para cada jogador na equipe perdedora, atualizar seus jogos_jogados e jogos_perdidos
+        // update loosing team score
         foreach ($losing_players as $player) {
             $stmt = $conn->prepare('UPDATE Ranking SET jogos_jogados = jogos_jogados + 1, jogos_perdidos = jogos_perdidos + 1 WHERE id_utilizador = :id_utilizador AND id_liga = (SELECT id_liga FROM Jogos WHERE id = :id_jogo)');
             $stmt->bindParam(':id_utilizador', $player['id_utilizador']);
@@ -397,7 +395,7 @@ class GameController
             $stmt->execute();
         }
 
-        // Finalmente, atualizar o status do jogo para "Terminado"
+        // change game status to Terminated (0)
         $stmt = $conn->prepare('UPDATE Jogos SET status = 0 WHERE id = :id_jogo');
         $stmt->bindParam(':id_jogo', $id_jogo);
         $stmt->execute();

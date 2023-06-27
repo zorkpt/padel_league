@@ -6,8 +6,10 @@
 extract($leagueMembers);
 extract($ongoingLeagueGames);
 extract($lastFiveGames);
+extract($ranking);
 ?>
 <?php extract($openLeagueGames); ?>
+
 
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
@@ -35,36 +37,55 @@ extract($lastFiveGames);
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>João</td>
-                            <td>23</td>
-                            <td>7</td>
-                        </tr>
-                        <tr>
-                            <td>Maria</td>
-                            <td>20</td>
-                            <td>7</td>
-                        </tr>
+
+                        <?php foreach ($ranking as $row): ?>
+                            <tr>
+
+                                <td><?= $row['nome_utilizador'] ?></td>
+                                <td><?= $row['total_pontuacao'] ?></td>
+                                <td><?= $row['jogos_jogados'] ?></td>
+                            </tr>
+                        <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
-            </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <!-- Jogos da Liga -->
                 <div class="bg-white shadow overflow-hidden sm:rounded-lg p-4">
                     <h2 class="text-2xl font-bold mb-2">Ultimos Jogos Terminados</h2>
-<!--                    --><?php //dd($lastFiveGames); ?>
+                    <!--                    --><?php //dd($lastFiveGames); ?>
                     <?php foreach ($lastFiveGames as $game): ?>
                         <p>
-                            <?php dd($game['players']); ?>
                             <strong>Jogo <?= $game['id'] ?>:</strong>
-                            <a href="/game/show?id=<?= $game['id'] ?>">
-                                TEAM 1 (Score: <?= $game[0]['nome_utilizador'] . ' e ' .  $game[1]['nome_utilizador'] . $game['team1_score'] ?>) vs.
-                                TEAM 2 (Score: <?= $game[2]['nome_utilizador'] . ' e ' .  $game[3]['nome_utilizador'] . $game['team2_score'] ?>)
+                            <a href="/game?id=<?= $game['id'] ?>">
+                                <?php
+                                // Verifique se 'players' é um array antes de tentar usar array_filter
+                                if (is_array($game['players'])) {
+                                    // Separa jogadores por equipe
+                                    $team1 = array_filter($game['players'], function ($player) {
+                                        return $player['equipa'] == 1;
+                                    });
+                                    $team2 = array_filter($game['players'], function ($player) {
+                                        return $player['equipa'] == 2;
+                                    });
+
+                                    // Constrói strings de nomes de equipe
+                                    $team1_names = array_column($team1, 'nome_utilizador');
+                                    $team2_names = array_column($team2, 'nome_utilizador');
+
+                                    // Imprime os nomes das equipes e as pontuações
+                                    echo " - " . implode(' e ', $team1_names) . ' [' . $game['team1_score'] . ']' . ' - ' . '[' . $game['team2_score'] . ']' . " - " . implode(' e ', $team2_names);
+
+                                } else {
+                                    echo "Sem jogadores.";
+                                }
+                                ?>
                             </a>
                         </p>
                     <?php endforeach; ?>
+
+
                 </div>
 
                 <!-- Gerenciamento da Liga -->
@@ -77,7 +98,7 @@ extract($lastFiveGames);
                     <div class="mt-2">
                         <label for="invite-code" class="block text-sm font-medium text-gray-700">Código de
                             convite</label>
-<!--                        --><?php //dd($inviteCode); ?>
+                        <!--                        --><?php //dd($inviteCode); ?>
                         <input type="text" name="invite-code" id="invite-code"
                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                value="<?php echo $inviteCode['codigo_convite']; ?>" readonly>
