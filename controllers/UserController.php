@@ -93,7 +93,7 @@ class UserController
 
             if ($new_password != $confirm_new_password) {
                 Session::setFlashMessage('password', 'As senhas não são iguais');
-                header("Location: /profile");
+                header("Location: /settings");
                 exit();
             }
 
@@ -106,7 +106,7 @@ class UserController
 
             if (!password_verify($old_password, $user['password_hash'])) {
                 Session::setFlashMessage('password', 'A senha antiga está incorreta.');
-                header("Location: /profile");
+                header("Location: /settings");
                 exit();
             }
 
@@ -118,7 +118,7 @@ class UserController
             $stmt->execute();
 
             Session::setFlashMessage('success_message', 'Senha alterada com sucesso.');
-            header('Location: /profile');
+            header('Location: /settings');
 
         }
 
@@ -131,7 +131,7 @@ class UserController
 
             if(!filter_var($newMail, FILTER_VALIDATE_EMAIL) || empty($newMail)) {
                 Session::setFlashMessage('email','Formato de e-mail inválido.');
-                header('Location: /profile');
+                header('Location: /settings');
                 exit();
             }
 
@@ -144,7 +144,7 @@ class UserController
             if ($existingEmail) {
 
                 Session::setFlashMessage('email', 'Este e-mail já está em uso.');
-                header('Location: /profile');
+                header('Location: /settings');
                 exit();
             }
 
@@ -157,7 +157,7 @@ class UserController
             $_SESSION['user']['email'] = $newMail;
 
             Session::setFlashMessage('success_mail_message', 'E-mail alterado com sucesso.');
-            header('Location: /profile');
+            header('Location: /settings');
 
         }
     }
@@ -169,18 +169,50 @@ class UserController
         require_once '../views/user/dashboard.php';
     }
 
-    public static function profile()
+    public static function settings()
     {
         if (!isLoggedIn()) {
+            Session::setFlashMessage('login', 'Faz Login para ver esta página');
             header('Location: /login');
             exit;
         }
-        require_once BASE_PATH . '/views/user/profile.php';
+        require_once BASE_PATH . '/views/user/settings.php';
     }
 
-    public static function settings()
+
+
+    public static function profile()
     {
-        require_once '../views/user/settings.php';
+        if($_SERVER['REQUEST_METHOD'] == 'GET'){
+            $user_id = $_GET['id'];
+
+            // username query
+            $conn = dbConnect();
+            $stmt = $conn->prepare('SELECT nome_utilizador from Utilizadores where id = :id');
+            $stmt->bindParam(':id', $user_id);
+            $stmt->execute();
+
+            $user_name = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // scores
+            $stmt = $conn->prepare('SELECT jogos_jogados, jogos_ganhos FROM Ranking where id_utilizador = :id');
+            $stmt->bindParam(':id', $user_id);
+            $stmt->execute();
+
+            $score = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if($score['jogos_jogados'] > 0) {
+                $win_loss_ratio = ($score['jogos_ganhos'] / $score['jogos_jogados']) * 100;
+            }else{
+                $win_loss_ratio = 0;
+            }
+
+
+            // leagues
+            $leagues = LeagueController::getLeaguesUser($user_id);
+
+        }
+        require_once BASE_PATH . '/views/user/profile.php';
     }
 
     public static function logout()

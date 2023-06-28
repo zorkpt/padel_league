@@ -68,11 +68,13 @@ class LeagueController
     {
         $conn = dbConnect();
         $stmt = $conn->prepare(
-            'SELECT Ligas.id, Ligas.nome, Ligas.descricao, Ligas.data_criacao, COUNT(Membros_Liga.id_utilizador) AS membros_ativos
-        FROM Ligas
-        LEFT JOIN Membros_Liga ON Ligas.id = Membros_Liga.id_liga
-        WHERE Membros_Liga.id_utilizador = :user_id
-        GROUP BY Ligas.id;'
+            'SELECT Ligas.id, Ligas.nome, Ligas.descricao, Ligas.data_criacao, COUNT(DISTINCT Membros_Liga_Count.id_utilizador) AS membros_ativos
+FROM Ligas
+JOIN Membros_Liga ON Ligas.id = Membros_Liga.id_liga
+LEFT JOIN Membros_Liga AS Membros_Liga_Count ON Ligas.id = Membros_Liga_Count.id_liga
+WHERE Membros_Liga.id_utilizador = :user_id
+GROUP BY Ligas.id;'
+
         );
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -165,7 +167,7 @@ class LeagueController
 
     public static function getLeagueMembers($league_id) {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT Utilizadores.nome_utilizador FROM Utilizadores JOIN Membros_Liga ON Utilizadores.id = Membros_Liga.id_utilizador WHERE Membros_Liga.id_liga = :league_id');
+        $stmt = $conn->prepare('SELECT nome_utilizador, id FROM Utilizadores JOIN Membros_Liga ON Utilizadores.id = Membros_Liga.id_utilizador WHERE Membros_Liga.id_liga = :league_id');
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

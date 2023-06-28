@@ -13,6 +13,7 @@ extract($ranking);
 
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+        <a href="/dashboard">Voltar</a>
         <div class="container mx-auto px-4">
             <h1 class="text-4xl font-bold mt-4 mb-6"><?= $leagueDetails['nome'] ?></h1>
 
@@ -111,7 +112,7 @@ extract($ranking);
             <div class="bg-white shadow overflow-hidden sm:rounded-lg p-4">
                 <h2 class="text-2xl font-bold mb-2">Membros da Liga</h2>
                 <?php foreach ($leagueMembers as $member) { ?>
-                    <p><strong> <?= htmlspecialchars($member['nome_utilizador']) ?> </strong></p>
+                    <p><strong><a href="/profile?id=<?= $member['id'] ?>"> <?= htmlspecialchars($member['nome_utilizador']) ?> </a></strong></p>
                 <?php } ?>
             </div>
             <!-- Jogos Abertos da Liga -->

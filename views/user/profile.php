@@ -1,70 +1,71 @@
-<?php require BASE_PATH . "/views/partials/head.php"; ?>
-<?php require BASE_PATH . "/views/partials/nav.php"; ?>
+
+
+
+<?php require  BASE_PATH . "/views/partials/head.php"; ?>
+<?php require  BASE_PATH . "/views/partials/nav.php"; ?>
 <?php $header = 'Perfil'; ?>
 <?php require BASE_PATH . "/views/partials/banner.php"; ?>
 
-
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-        <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-            <h2>Perfil do utilizador</h2>
-            <form method="post" action="/user/updateEmail">
-                <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Nome de
-                    Utilizador:</label><br>
-                <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                       type="text" id="username" name="username" value="<?= $_SESSION['user']['nome_utilizador'] ?>"
-                       readonly><br>
-                <label class="block text-sm font-medium leading-6 text-gray-900" for="email">Endereço de E-Mail:</label><br>
-                <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                       type="email" id="email" name="email" value="<?= $_SESSION['user']['email'] ?>"><br>
-                <div class="mt-6 flex items-center justify-end gap-x-6">
-                    <?php if ($message = Session::getFlash('email')): ?>
-                        <div class="text-red-500 mt-2 text-sm">
-                            <?php echo $message; ?>
-                        </div>
-                    <?php endif; ?>
-                    <?php if ($message = Session::getFlash('success_mail_message')): ?>
-                        <div class="text-green-500 mt-2 text-sm">
-                            <?php echo $message; ?>
-                        </div>
-                    <?php endif; ?>
-                    <button type="submit"
-                            class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                        Atualizar
-                    </button>
-                </div>
-            </form>
-            <h3>Alterar senha</h3>
-            <form method="post" action="/user/updatePassword">
-                <label class="block text-sm font-medium leading-6 text-gray-900" for="old_password">Senha antiga:</label><br>
-                <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="old_password" name="old_password"><br>
-                <label class="block text-sm font-medium leading-6 text-gray-900" for="new_password">Nova senha:</label><br>
-                <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="new_password" name="new_password"><br>
-                <label class="block text-sm font-medium leading-6 text-gray-900" for="confirm_new_password">Confirmar Nova senha:</label><br>
-                <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="confirm_new_password" name="confirm_new_password"><br>
+        <div class="container mx-auto my-10 p-6 md:px-12">
 
-                <?php if ($message = Session::getFlash('password')): ?>
-                    <div class="text-red-500 mt-2 text-sm">
-                        <?php echo $message; ?>
-                    </div>
-                <?php endif; ?>
-                <?php if ($message = Session::getFlash('success_mail_message')): ?>
-                    <div class="text-green-500 mt-2 text-sm">
-                        <?php echo $message; ?>
-                    </div>
-                <?php endif; ?>
-                <div class="mt-6 flex items-center justify-end gap-x-6">
-                    <button type="submit"
-                            class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                        Alterar Senha
-                    </button>
+            <div class="w-full md:w-1/2 lg:w-1/3 flex flex-col items-center mx-auto">
+
+                <!-- Avatar -->
+                <div class="w-32 h-32 mb-4 rounded-full bg-gray-400"></div>
+
+                <!-- Nome do utilizador -->
+<!--                --><?php //dd($user_name); ?>
+                <h2 class="text-2xl font-semibold mb-2"><?php echo $user_name['nome_utilizador']; ?></h2>
+
+                <!-- W/L Ratio -->
+                <div class="text-gray-600 mb-10">
+                    <span>Jogos: <?= $score['jogos_jogados'];  ?> </span>
+                    <span>Vitorias: <?= $score['jogos_ganhos']; ?></span>
+                    <span>Win Rate: <?php echo $win_loss_ratio; ?></span>
                 </div>
-            </form>
+
+                <!-- Botão de Enviar Mensagem -->
+                <button class="mb-4 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                    Enviar Mensagem
+                </button>
+
+                <!-- Ligas -->
+                <h3 class="text-lg font-semibold mb-2">Ligas</h3>
+<!---->
+
+                <table class="table-auto">
+                    <thead>
+                    <tr>
+                        <th class="px-4 py-2">Nome da Liga</th>
+                        <th class="px-4 py-2">Descrição</th>
+
+                        <th class="px-4 py-2">Membros Ativos</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($leagues as $league) : ?>
+                        <tr>
+                            <td class="border px-4 py-2"><a class="text-blue-500 hover:underline"
+                                                            href="league?id=<?= $league['id'] ?>"><?= htmlspecialchars($league['nome']) ?></a>
+                            </td>
+                            <td class="border px-4 py-2"><?= htmlspecialchars($league['descricao']) ?></td>
+
+                            <td class="border px-4 py-2"><?= htmlspecialchars($league['membros_ativos']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+
+
+            </div>
+
         </div>
     </div>
 </main>
 
-<?php require BASE_PATH . "/views/partials/footer.php"; ?>
+<?php require  BASE_PATH . "/views/partials/footer.php"; ?>
 
 
 

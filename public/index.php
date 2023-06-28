@@ -105,13 +105,13 @@ switch ($request_uri[0]) {
 
 
     // Página do perfil do usuário
-    case '/profile':
-        UserController::profile();
+    case '/settings':
+        UserController::settings();
         break;
 
     // Página de configurações
-    case '/settings':
-        UserController::settings();
+    case '/profile':
+        UserController::profile();
         break;
 
     default:
