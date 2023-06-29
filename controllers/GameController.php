@@ -106,15 +106,16 @@ class GameController
     public static function getPlayersInGame($game_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT Utilizadores.id, Utilizadores.nome_utilizador, Jogadores_Jogo.equipa 
-                            FROM Jogadores_Jogo 
-                            JOIN Utilizadores ON Jogadores_Jogo.id_utilizador = Utilizadores.id 
-                            WHERE Jogadores_Jogo.id_jogo = :game_id
-                            ORDER BY Jogadores_Jogo.equipa ASC');
+        $stmt = $conn->prepare('SELECT Utilizadores.id, Utilizadores.nome_utilizador, Utilizadores.avatar, Jogadores_Jogo.equipa 
+                        FROM Jogadores_Jogo 
+                        JOIN Utilizadores ON Jogadores_Jogo.id_utilizador = Utilizadores.id 
+                        WHERE Jogadores_Jogo.id_jogo = :game_id
+                        ORDER BY Jogadores_Jogo.equipa ASC');
         $stmt->bindValue(':game_id', $game_id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
 
     public static function getPlayerIdsInGame($game_id)
