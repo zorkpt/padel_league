@@ -157,17 +157,23 @@ GROUP BY Ligas.id;'
         $membership = $stmt->fetch(PDO::FETCH_ASSOC);
         return $membership != false;  // return true if its a member, false otherwise
     }
+
     public static function getLeagueInfo($league_id) {
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT nome, descricao, id_criador, data_criacao FROM Ligas WHERE id = :league_id');
-        $stmt->bindParam(':league_id', $league_id);
+        $stmt->bindParam(':league_id', $league_id, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $leagueInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Getting data for League creator
+        $creatorData = UserController::getUserData($leagueInfo['id_criador']);
+
+        return array_merge($leagueInfo, $creatorData);
     }
 
     public static function getLeagueMembers($league_id) {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT nome_utilizador, id FROM Utilizadores JOIN Membros_Liga ON Utilizadores.id = Membros_Liga.id_utilizador WHERE Membros_Liga.id_liga = :league_id');
+        $stmt = $conn->prepare('SELECT nome_utilizador, id, avatar FROM Utilizadores JOIN Membros_Liga ON Utilizadores.id = Membros_Liga.id_utilizador WHERE Membros_Liga.id_liga = :league_id');
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -203,7 +209,7 @@ GROUP BY Ligas.id;'
 
     public static function getPlayerRankings($league_id) {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT Ranking.id_utilizador, Utilizadores.nome_utilizador, Ranking.pontos as total_pontuacao, Ranking.jogos_jogados FROM Ranking
+        $stmt = $conn->prepare('SELECT Ranking.id_utilizador, Utilizadores.nome_utilizador, Utilizadores.avatar, Ranking.pontos as total_pontuacao, Ranking.jogos_jogados FROM Ranking
 JOIN Utilizadores ON Ranking.id_utilizador = Utilizadores.id
 WHERE Ranking.id_liga = :league_id 
 ORDER BY total_pontuacao DESC');
@@ -211,6 +217,7 @@ ORDER BY total_pontuacao DESC');
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
 
 

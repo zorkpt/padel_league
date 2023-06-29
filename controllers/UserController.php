@@ -9,45 +9,114 @@ class UserController
             $username = $_POST['username'];
             $email = $_POST['email'];
             $password = $_POST['password'];
+            $avatar = $_FILES['avatar'];
             $created_date = date("Y-m-d H:i:s");
 
-            if (empty($username)) {
-                $errors['username'] = 'Campo obrigatório';
+            // Restante do código para validar campos ...
+
+            list($avatarDestination, $avatarErrors) = self::handleAvatarUpload($avatar);
+
+            if (!empty($avatarErrors)) {
+                $errors = array_merge($errors, $avatarErrors);
             }
 
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL) || empty($email)) {
-                $errors['email'] = 'E-Mail Inválido';
-            }
-            if (empty($password)) {
-                $errors['password'] = 'Campo obrigatório';
-            }
-
+            // Caso não existam erros, insere os dados na base de dados
             if (empty($errors)) {
-
-
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
 
                 $conn = dbConnect();
 
-                $stmt = $conn->prepare("INSERT INTO Utilizadores (nome_utilizador, email, password_hash, data_registo) VALUES (:username, :email, :password, :data_registo)");
+                $stmt = $conn->prepare("INSERT INTO Utilizadores (nome_utilizador, email, password_hash, avatar, data_registo) VALUES (:username, :email, :password, :avatar, :data_registo)");
                 $stmt->bindParam(':username', $username);
                 $stmt->bindParam(':email', $email);
                 $stmt->bindParam(':password', $hashed_password);
-                $stmt->bindParam('data_registo', $created_date);
+                $stmt->bindParam(':avatar', $avatarDestination);
+                $stmt->bindParam(':data_registo', $created_date);
 
                 $stmt->execute();
-
 
                 header('Location: /login');
             } else {
                 $_SESSION['errors'] = $errors;
             }
-
-
         }
 
         require_once '../views/user/register.php';
+    }
+
+    public static function updateAvatar()
+    {
+        try {
+            // Handle the uploaded avatar
+            list($avatarPath, $errors) = self::handleAvatarUpload($_FILES['avatar']);
+
+            if (!empty($errors)) {
+                throw new Exception(implode(", ", $errors));
+            }
+
+            // Update the avatar in the database
+            $conn = dbConnect();
+            $stmt = $conn->prepare("UPDATE Utilizadores SET avatar = :avatar WHERE id = :id");
+            $stmt->bindParam(':avatar', $avatarPath);
+            $stmt->bindParam(':id', $_SESSION['user']['id']);
+            $stmt->execute();
+
+            // Update the avatar in the session
+            $_SESSION['user']['avatar'] = $avatarPath;
+
+            // Set a success message
+            Session::setFlashMessage('success_avatar_message', 'O avatar foi atualizado com sucesso!');
+
+        } catch (Exception $e) {
+            // Set an error message
+            Session::setFlashMessage('avatar', $e->getMessage());
+        }
+
+        // Redirect back to the profile page
+        header('Location: /settings');
+        exit;
+    }
+
+
+    public static function handleAvatarUpload($avatar)
+    {
+        $errors = [];
+
+        if (!isset($avatar) || $avatar['error'] !== UPLOAD_ERR_OK) {
+            $errors['avatar'] = 'Problema no upload do avatar';
+        } else {
+            $avatarName = $avatar['name'];
+            $avatarTmpName = $avatar['tmp_name'];
+            $avatarSize = $avatar['size'];
+            $avatarError = $avatar['error'];
+            $avatarType = $avatar['type'];
+
+            $avatarExt = explode('.', $avatarName);
+            $avatarActualExt = strtolower(end($avatarExt));
+
+            $allowed = array('jpg', 'jpeg', 'png');
+
+            if (!in_array($avatarActualExt, $allowed)) {
+                $errors['avatar'] = "Apenas são permitidos arquivos jpg, jpeg e png!";
+            }
+            if ($avatarError !== 0) {
+                $errors['avatar'] = "Erro ao carregar o arquivo!";
+            }
+            if ($avatarSize > 5000000) {
+                $errors['avatar'] = "O arquivo é demasiado grande!";
+            }
+
+            if (empty($errors)) {
+                $avatarNameNew = uniqid('', true) . "." . $avatarActualExt;
+                $avatarDestination = '/uploads/' . $avatarNameNew;
+                $absolutePath = $_SERVER['DOCUMENT_ROOT'] . $avatarDestination;
+                move_uploaded_file($avatarTmpName, $absolutePath);
+
+                return [$avatarDestination, null]; // Retorne o local do avatar e null para erros
+            }
+        }
+
+        return [null, $errors]; // Se houver erros, retorne null para o local do avatar e os erros
     }
 
     public static function login()
@@ -59,11 +128,11 @@ class UserController
             $password = $_POST['password'];
 
             $conn = dbConnect();
-            $stmt = $conn->prepare('SELECT id, nome_utilizador, password_hash, email FROM Utilizadores WHERE nome_utilizador = :username');
+            $stmt = $conn->prepare('SELECT id, nome_utilizador, password_hash, email, avatar FROM Utilizadores WHERE nome_utilizador = :username');
             $stmt->bindParam(':username', $username);
             $stmt->execute();
 
-            $user = $stmt->fetch();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
             unset($user['password']);
 
 
@@ -213,6 +282,15 @@ class UserController
 
         }
         require_once BASE_PATH . '/views/user/profile.php';
+    }
+
+
+    public static function getUserData($user_id) {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT nome_utilizador, avatar FROM Utilizadores WHERE id = :user_id');
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public static function logout()

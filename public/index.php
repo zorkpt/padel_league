@@ -45,6 +45,10 @@ switch ($request_uri[0]) {
         UserController::changeEmail();
         break;
 
+    case '/user/updateAvatar':
+        UserController::updateAvatar();
+        break;
+
 
     // Página do painel
     case '/dashboard':

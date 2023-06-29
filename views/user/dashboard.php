@@ -6,6 +6,7 @@
 <?php
 extract($leagues);
 ?>
+
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
         <table class="table-auto">
@@ -21,7 +22,7 @@ extract($leagues);
             <?php foreach ($leagues as $league) : ?>
                 <tr>
                     <td class="border px-4 py-2"><a class="text-blue-500 hover:underline"
-                                                    href="league?id=<?= $league['id'] ?>"><?= htmlspecialchars($league['nome']) ?></a>
+                                                    href="league?id=<?= $league['id'] ?>"><?= htmlspecialchars($league['nome']) ?>
                     </td>
                     <td class="border px-4 py-2"><?= htmlspecialchars($league['descricao']) ?></td>
                     <td class="border px-4 py-2"><?= htmlspecialchars($league['data_criacao']) ?></td>

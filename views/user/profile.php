@@ -13,11 +13,12 @@
             <div class="w-full md:w-1/2 lg:w-1/3 flex flex-col items-center mx-auto">
 
                 <!-- Avatar -->
-                <div class="w-32 h-32 mb-4 rounded-full bg-gray-400"></div>
+
+                <div class="w-32 h-32 mb-4 rounded-full bg-gray-400"><img alt="avatar" class="rounded-full" src="<?= $_SESSION['user']['avatar']; ?>"> </div>
 
                 <!-- Nome do utilizador -->
 <!--                --><?php //dd($user_name); ?>
-                <h2 class="text-2xl font-semibold mb-2"><?php echo $user_name['nome_utilizador']; ?></h2>
+                <h2 class="text-2xl font-semibold mb-2 mt-4"><?php echo $user_name['nome_utilizador']; ?></h2>
 
                 <!-- W/L Ratio -->
                 <div class="text-gray-600 mb-10">
