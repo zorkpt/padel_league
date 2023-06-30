@@ -121,6 +121,11 @@ class UserController
 
     public static function login()
     {
+        if(isLoggedIn()) {
+            header('Location: /dashboard');
+            exit;
+        }
+
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -141,7 +146,7 @@ class UserController
                 session_start();
                 $_SESSION['user'] = $user;
 
-                header('Location: /');
+                header('Location: /dashboard');
                 exit;
             } else {
                 $errors['login'] = 'Nome de usuário ou senha incorretos.';

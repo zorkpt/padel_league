@@ -6,16 +6,14 @@
             <div class="flex h-16 items-center justify-between">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company">
+                        <img class="h-8 w-8" src="/logo.png" alt="Liga-Padel">
                     </div>
                     <div class="hidden md:block">
                         <div class="ml-10 flex items-baseline space-x-4">
                             <?php if(isLoggedIn()):?>
-                                <a href="/" class="<?= uriIs('/') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">Inicio</a>
                                 <a href="/dashboard" class="<?= uriIs('/dashboard') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">Dashboard</a>
                                 <a href="/league/join" class="<?= uriIs('/league') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">Juntar a Liga</a>
                                    <?php else: ?>
-                                <a href="/" class="<?= uriIs('/') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">Inicio</a>
                                 <a href="/register" class="<?= uriIs('/register') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">Registrar</a>
                                 <a href="/login" class="<?= uriIs('/login') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">Login</a>
                             <?php endif ?>

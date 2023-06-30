@@ -1,5 +1,7 @@
 </div>
-
+<footer class="bg-white p-6 text-center">
+    <p class="text-gray-800">&copy; 2023 Liga-Padel. Todos os direitos reservados.</p>
+</footer>
 <script>
     // Obtém a referência do botão do menu do usuário
     var userMenuButton = document.getElementById('user-menu-button');
