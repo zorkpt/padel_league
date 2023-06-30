@@ -70,7 +70,7 @@ switch ($request_uri[0]) {
         break;
 
     // Página de agendamento do jogo
-    case '/game_schedule':
+    case '/game/schedule':
         GameController::schedule();
         break;
 
