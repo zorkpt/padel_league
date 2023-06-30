@@ -6,6 +6,13 @@ class LeagueController
 {
     public static function create()
     {
+        // verify if user is logged in
+        if(!isLoggedIn()) {
+            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            header('Location: /login');
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $name = $_POST['league'];
             $description = $_POST['descricao'];
@@ -84,6 +91,13 @@ GROUP BY Ligas.id;'
 
     public static function viewLeague()
     {
+        // verify if user is logged in
+        if(!isLoggedIn()) {
+            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            header('Location: /login');
+            exit;
+        }
+
         if (isset($_GET['id'])) {
             $league_id = $_GET['id'];
             $user_id = $_SESSION['user']['id'];
@@ -218,11 +232,13 @@ ORDER BY total_pontuacao DESC');
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-
-
-
     public static function joinLeague() {
+        // verify if user is logged in
+        if(!isLoggedIn()) {
+            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            header('Location: /login');
+            exit;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             require_once '../views/liga/join.php';

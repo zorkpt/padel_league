@@ -12,7 +12,23 @@ class UserController
             $avatar = $_FILES['avatar'];
             $created_date = date("Y-m-d H:i:s");
 
-            // Restante do código para validar campos ...
+            // Verificando campos de usuário e senha
+            if(empty($username)) {
+                $errors['username'] = "Nome de usuário é obrigatório.";
+            } else if(strlen($username) < 3) {
+                $errors['username'] = "Nome de usuário deve ter pelo menos 3 caracteres.";
+            } else {
+                $userExists = self::checkUserExists($username);
+                if($userExists) {
+                    $errors['username'] = "Nome de usuário já está em uso.";
+                }
+            }
+            if(empty($email)){
+                $errors['email'] = "E-mail é obrigatorio";
+            }
+            if(empty($password)) {
+                $errors['password'] = "Senha é obrigatória.";
+            }
 
             list($avatarDestination, $avatarErrors) = self::handleAvatarUpload($avatar);
 
@@ -44,8 +60,28 @@ class UserController
         require_once '../views/user/register.php';
     }
 
+
+    public static function checkUserExists($username)
+    {
+        $conn = dbConnect();
+
+        $stmt = $conn->prepare("SELECT * FROM Utilizadores WHERE nome_utilizador = :username LIMIT 1");
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+
+        // Retorna verdadeiro se um usuário existir com o nome especificado
+        return $stmt->rowCount() > 0;
+    }
+
     public static function updateAvatar()
     {
+        // verify if user is logged in
+        if(!isLoggedIn()) {
+            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            header('Location: /login');
+            exit;
+        }
+
         try {
             // Handle the uploaded avatar
             list($avatarPath, $errors) = self::handleAvatarUpload($_FILES['avatar']);
@@ -81,42 +117,42 @@ class UserController
     public static function handleAvatarUpload($avatar)
     {
         $errors = [];
+        $avatarDestination = "/uploads/default.png"; // Valor padrão se não houver upload
 
-        if (!isset($avatar) || $avatar['error'] !== UPLOAD_ERR_OK) {
-            $errors['avatar'] = 'Problema no upload do avatar';
-        } else {
-            $avatarName = $avatar['name'];
-            $avatarTmpName = $avatar['tmp_name'];
-            $avatarSize = $avatar['size'];
-            $avatarError = $avatar['error'];
-            $avatarType = $avatar['type'];
+        // Verifique se um arquivo foi realmente enviado
+        if (isset($avatar) && $avatar['error'] !== UPLOAD_ERR_NO_FILE) {
+            if ($avatar['error'] !== UPLOAD_ERR_OK) {
+                $errors['avatar'] = 'Problema no upload do avatar';
+            } else {
+                $avatarName = $avatar['name'];
+                $avatarTmpName = $avatar['tmp_name'];
+                $avatarSize = $avatar['size'];
+                $avatarType = $avatar['type'];
 
-            $avatarExt = explode('.', $avatarName);
-            $avatarActualExt = strtolower(end($avatarExt));
+                $avatarExt = explode('.', $avatarName);
+                $avatarActualExt = strtolower(end($avatarExt));
 
-            $allowed = array('jpg', 'jpeg', 'png');
+                $allowed = array('jpg', 'jpeg', 'png');
 
-            if (!in_array($avatarActualExt, $allowed)) {
-                $errors['avatar'] = "Apenas são permitidos arquivos jpg, jpeg e png!";
-            }
-            if ($avatarError !== 0) {
-                $errors['avatar'] = "Erro ao carregar o arquivo!";
-            }
-            if ($avatarSize > 5000000) {
-                $errors['avatar'] = "O arquivo é demasiado grande!";
-            }
+                if (!in_array($avatarActualExt, $allowed)) {
+                    $errors['avatar'] = "Apenas são permitidos arquivos jpg, jpeg e png!";
+                }
 
-            if (empty($errors)) {
-                $avatarNameNew = uniqid('', true) . "." . $avatarActualExt;
-                $avatarDestination = '/uploads/' . $avatarNameNew;
-                $absolutePath = $_SERVER['DOCUMENT_ROOT'] . $avatarDestination;
-                move_uploaded_file($avatarTmpName, $absolutePath);
+                if ($avatarSize > 5000000) {
+                    $errors['avatar'] = "O arquivo é demasiado grande!";
+                }
 
-                return [$avatarDestination, null]; // Retorne o local do avatar e null para erros
+                if (empty($errors)) {
+                    $avatarNameNew = uniqid('', true) . "." . $avatarActualExt;
+                    $avatarDestination = '/uploads/' . $avatarNameNew;
+                    $absolutePath = $_SERVER['DOCUMENT_ROOT'] . $avatarDestination;
+                    move_uploaded_file($avatarTmpName, $absolutePath);
+                }
             }
         }
 
-        return [null, $errors]; // Se houver erros, retorne null para o local do avatar e os erros
+        // Retorne o local do avatar e os erros
+        return [$avatarDestination, $errors];
     }
 
     public static function login()
@@ -159,6 +195,13 @@ class UserController
 
     public static function changePassword()
     {
+        // verify if user is logged in
+        if(!isLoggedIn()) {
+            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            header('Location: /login');
+            exit;
+        }
+
         $errors = [];
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $old_password = $_POST['old_password'];
@@ -200,6 +243,13 @@ class UserController
 
     public static function changeEmail()
     {
+        // verify if user is logged in
+        if(!isLoggedIn()) {
+            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            header('Location: /login');
+            exit;
+        }
+
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $newMail = $_POST['email'];
 

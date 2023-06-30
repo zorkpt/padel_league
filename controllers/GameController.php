@@ -8,6 +8,13 @@ class GameController
 {
     public static function schedule()
     {
+        // verify if user is logged in
+        if(!isLoggedIn()) {
+            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            header('Location: /login');
+            exit;
+        }
+
         require_once BASE_PATH . 'views/jogo/game_schedule.php';
     }
 
