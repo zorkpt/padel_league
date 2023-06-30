@@ -8,5 +8,12 @@ class HomeController {
         }
         require_once '../views/home/home.php';
     }
+
+    public static function error() {
+        $errors = [];
+        $errors = Session::getFlash('access_error');
+
+        require_once  BASE_PATH . 'views/error.php';
+    }
 }
 

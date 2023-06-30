@@ -8,12 +8,12 @@ class GameController
 {
     public static function schedule()
     {
-        require_once '../views/jogo/game_schedule.php';
+        require_once BASE_PATH . 'views/jogo/game_schedule.php';
     }
 
     public static function index()
     {
-        require_once '../views/jogo/game.php';
+        require_once BASE_PATH . 'views/jogo/game.php';
     }
 
     public static function addGame()
@@ -22,9 +22,10 @@ class GameController
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['league_id'])) {
             $user_id = $_SESSION['user']['id'];
             $league_id = $_POST['league_id'];
+
             // Verify if user is a member of the league
             if (!LeagueController::isUserMemberOfLeague($user_id, $league_id)) {
-                Session::setFlashMessage('access_error', 'Você não é um membro desta liga.');
+                Session::setFlashMessage('access_error', 'Não és um membro desta liga.');
                 header('Location: /error');
                 exit();
             }
