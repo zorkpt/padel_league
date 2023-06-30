@@ -15,7 +15,7 @@ require_once '../controllers/Session.php';
 $request_uri = explode('?', $_SERVER['REQUEST_URI'], 2);
 $db = dbConnect();
 session_start();
-// Roteamento
+// Routing
 
 switch ($request_uri[0]) {
     // Página inicial
@@ -116,6 +116,11 @@ switch ($request_uri[0]) {
     // Página de configurações
     case '/profile':
         UserController::profile();
+        break;
+
+        // Errors
+    case '/error';
+        HomeController::error();
         break;
 
     default:
