@@ -11,7 +11,9 @@
 <main>
 
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-        <a href="/league?id=<?= $game['id_liga'] ?>">Voltar</a>
+        <a href="/league?id=<?= $game['id_liga'] ?>" class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">
+            Voltar
+        </a>
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -83,40 +85,62 @@
         </div>
 
         <?php if ($game['status'] == GAME_LOCKED || $game['status'] == GAME_FINISHED): ?>
-            <div class="mt-4">
-                <h2 class="text-lg font-medium text-gray-900">TEAM 1 (Score: <?= $game['team1_score'] ?>):</h2>
-                <ul class="mt-2">
-                    <?php foreach ($players as $player): ?>
-                        <?php if ($player['equipa'] == 1): ?>
-                            <li><?= $player['nome_utilizador'] ?></li>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
+            <div class="flex justify-center items-center">
+                <!-- Team 1 -->
+                <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
+                    <h2 class="mb-4 text-xl font-bold text-center text-gray-700">TEAM 1:</h2>
+                    <ul class="mb-4 text-gray-700 text-center">
+                        <?php foreach ($players as $player): ?>
+                            <?php if ($player['equipa'] == 1): ?>
+                                <li class="flex items-center justify-center">
+                                    <img src="<?= $player['avatar'] ?>" alt="Avatar" class="w-8 h-8 rounded-full mr-2">
+                                    <?= $player['nome_utilizador'] ?>
+                                </li>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
 
-            <div class="mt-4">
-                <h2 class="text-lg font-medium text-gray-900">TEAM 2 (Score: <?= $game['team2_score'] ?>):</h2>
-                <ul class="mt-2">
-                    <?php foreach ($players as $player): ?>
-                        <?php if ($player['equipa'] == 2): ?>
-                            <li><?= $player['nome_utilizador'] ?></li>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </ul>
+                <!-- Score -->
+                <div class="mx-4 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
+                    <h2 class="mb-4 text-xl font-bold text-center text-gray-700">Score:</h2>
+                    <div class="text-center text-gray-700"><?= $game['team1_score'] ?> - <?= $game['team2_score'] ?></div>
+                </div>
+
+                <!-- Team 2 -->
+                <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
+                    <h2 class="mb-4 text-xl font-bold text-center text-gray-700">TEAM 2:</h2>
+                    <ul class="mb-4 text-gray-700 text-center">
+                        <?php foreach ($players as $player): ?>
+                            <?php if ($player['equipa'] == 2): ?>
+                                <li class="flex items-center justify-center">
+                                    <img src="<?= $player['avatar'] ?>" alt="Avatar" class="w-8 h-8 rounded-full mr-2">
+                                    <?= $player['nome_utilizador'] ?>
+                                </li>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
             </div>
         <?php endif; ?>
-
 
         <?php if ($game['status'] == GAME_OPEN): ?>
-            <div class="mt-4">
-                <h2 class="text-lg font-medium text-gray-900">Jogadores inscritos:</h2>
-                <ul class="mt-2">
-                    <?php foreach ($players as $player): ?>
-                        <li><?= $player['nome_utilizador'] ?></li>
-                    <?php endforeach; ?>
-                </ul>
+            <div class="mt-4 flex justify-center items-center">
+                <!-- Registered Players -->
+                <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
+                    <h2 class="mb-4 text-xl font-bold text-center text-gray-700">Jogadores inscritos:</h2>
+                    <ul class="mb-4 text-gray-700 text-center">
+                        <?php foreach ($players as $player): ?>
+                            <li class="flex items-center justify-center">
+                                <img src="<?= $player['avatar'] ?>" alt="Avatar" class="w-8 h-8 rounded-full mr-2">
+                                <?= $player['nome_utilizador'] ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
             </div>
         <?php endif; ?>
+
     </div>
 </main>
 

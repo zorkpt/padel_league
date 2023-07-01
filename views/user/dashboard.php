@@ -25,7 +25,7 @@ extract($leagues);
                                                           href="league?id=<?= $league['id'] ?>"><?= htmlspecialchars($league['nome']) ?>
                     </td>
                     <td class="px-6 py-4 items-center"><?= htmlspecialchars($league['descricao']) ?></td>
-                    <td class="px-6 py-4 items-center"><?= htmlspecialchars($league['data_criacao']) ?></td>
+                    <td class="px-6 py-4 items-center"><?= htmlspecialchars((new DateTime($league['data_criacao']))->format("d/m/Y")) ?></td>
                     <td class="px-6 py-4 items-center"><?= htmlspecialchars($league['membros_ativos']) ?></td>
                 </tr>
             <?php endforeach; ?>

@@ -25,7 +25,13 @@ class UserController
             }
             if(empty($email)){
                 $errors['email'] = "E-mail é obrigatorio";
+            }else {
+                $emailExists = self::checkEmailExists($email);
+                if($emailExists){
+                    $errors['email'] = "E-mail já está em uso.";
+                }
             }
+
             if(empty($password)) {
                 $errors['password'] = "Senha é obrigatória.";
             }
@@ -69,7 +75,19 @@ class UserController
         $stmt->bindParam(':username', $username);
         $stmt->execute();
 
-        // Retorna verdadeiro se um usuário existir com o nome especificado
+        // Return true if same name is found
+        return $stmt->rowCount() > 0;
+    }
+
+    public static function checkEmailExists($email)
+    {
+        $conn = dbConnect();
+
+        $stmt = $conn->prepare("SELECT * FROM Utilizadores WHERE email = :email LIMIT 1");
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+
+        // Return true if same mail is found
         return $stmt->rowCount() > 0;
     }
 
@@ -288,6 +306,10 @@ class UserController
 
     public static function dashboard()
     {
+        if(!isLoggedIn()) {
+            header('Location: /login');
+            exit;
+        }
         $user_id = $_SESSION['user']['id'];
         $leagues = LeagueController::getLeaguesUser($user_id);
         require_once '../views/user/dashboard.php';

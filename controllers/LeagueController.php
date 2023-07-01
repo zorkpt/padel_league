@@ -223,14 +223,15 @@ GROUP BY Ligas.id;'
 
     public static function getPlayerRankings($league_id) {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT Ranking.id_utilizador, Utilizadores.nome_utilizador, Utilizadores.avatar, Ranking.pontos as total_pontuacao, Ranking.jogos_jogados FROM Ranking
-JOIN Utilizadores ON Ranking.id_utilizador = Utilizadores.id
-WHERE Ranking.id_liga = :league_id 
-ORDER BY total_pontuacao DESC');
+        $stmt = $conn->prepare('SELECT Ranking.id_utilizador, Utilizadores.nome_utilizador, Utilizadores.avatar, Ranking.pontos as total_pontuacao, Ranking.jogos_jogados, Ranking.jogos_ganhos as vitorias, Ranking.jogos_perdidos as derrotas, (Ranking.jogos_ganhos / Ranking.jogos_jogados * 100) as win_rate FROM Ranking
+    JOIN Utilizadores ON Ranking.id_utilizador = Utilizadores.id
+    WHERE Ranking.id_liga = :league_id 
+    ORDER BY total_pontuacao DESC');
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     public static function joinLeague() {
         // verify if user is logged in

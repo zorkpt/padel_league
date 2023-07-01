@@ -28,7 +28,8 @@ extract($ranking);
                         </p>
                     </div>
                     <p>
-                        <span class="font-semibold">Data de Criação:</span> <?= htmlspecialchars($leagueDetails['data_criacao']) ?>
+                        <span class="font-semibold">Data de Criação:</span> <?= htmlspecialchars((new DateTime($leagueDetails['data_criacao']))->format("d/m/Y")) ?>
+
                     </p>
                     <p>
                         <span class="font-semibold">Descrição:</span> <?= htmlspecialchars($leagueDetails['descricao']) ?>
@@ -109,7 +110,7 @@ extract($ranking);
                 <div class="bg-white shadow overflow-hidden sm:rounded-lg p-4">
                     <h2 class="text-2xl font-bold mb-2">Gestão da Liga</h2>
                     <a href="/game/create?league_id=<?php echo $_GET['id']; ?>"
-                       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                       class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">
                         Criar Jogo
                     </a>
                     <div class="mt-2">
@@ -135,9 +136,11 @@ extract($ranking);
                         <thead>
                         <tr class="bg-gray-50">
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pontos</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jogos Jogados
-                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jogos</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vitorias</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Derrotas</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">WR</th>
+
                         </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -150,8 +153,11 @@ extract($ranking);
                                         <?= $row['nome_utilizador'] ?>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['total_pontuacao'] ?></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['jogos_jogados'] ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['vitorias'] ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['derrotas'] ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['win_rate'] ?>%</td>
+
                             </tr>
                         <?php endforeach; ?>
 
@@ -177,7 +183,7 @@ extract($ranking);
                         <tbody class="bg-white divide-y divide-gray-200">
                         <?php foreach ($openLeagueGames as $game) { ?>
                             <tr class="text-center">
-                                <td class="px-6 py-4 items-center"><?= htmlspecialchars($game['data_hora']) ?></td>
+                                <td class="px-6 py-4 items-center"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("d/m/Y H:i")) ?></td>
                                 <td class="px-6 py-4 items-center"><?= htmlspecialchars($game['local']) ?></td>
                                 <td class="px-6 py-4 items-center">
                                     <?= count(GameController::getPlayersInGame($game['id'])) ?>/4
