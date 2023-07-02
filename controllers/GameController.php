@@ -57,6 +57,31 @@ class GameController
             $stmt->bindParam(':game_id', $game_id);
             $stmt->bindParam(':user_id', $user_id);
             $stmt->execute();
+
+
+            //Send notifications to members
+
+            // Get all league users
+            $users = LeagueController::getLeagueUsers($league_id);
+
+            // Obtain League info to use the Name
+            $league_name = LeagueController::getLeagueInfo($league_id);
+
+            // filter game creator out
+            $users = array_filter($users, function ($user_in_league) use ($user_id) {
+                return $user_in_league != $user_id;
+            });
+
+
+            // Notificate each league member
+            $content = $_SESSION['user']['nome_utilizador'] . " criou um novo jogo na liga " . $league_name['nome'] . ". Vêm participar!";
+
+            // game link
+            $link = "/game?id=" . $game_id;
+
+            NotificationController::notifyUsers($users, $content, $link);
+
+
             // Redirect to the league page
             header('Location: /league?id=' . $league_id);
 
@@ -69,7 +94,6 @@ class GameController
             header('Location: /error');
         }
     }
-
 
     public static function show()
     {
@@ -172,7 +196,6 @@ class GameController
     {
         // Get the game ID from the GET parameters
         $game_id = $_GET['id'];
-        dd($game_id);
         $currentUserId = $_SESSION['user']['id']; // assuming user id is stored in session
 
         // Check if the game is still open
@@ -267,11 +290,9 @@ class GameController
 
     public static function registerResults()
     {
-        // Buscar os dados do jogo
         $game_id = $_GET['id'];
         $game = self::getGame($game_id);
 
-        // Renderizar a vista do formulário de registro de resultados
         require_once '../views/jogo/register_results.php';
     }
 
@@ -289,19 +310,11 @@ class GameController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $gameId = $_GET['id'];
 
-            // Aqui você precisa pegar os dados do POST request
-            // Estes serão os resultados do jogo que você deseja registrar
-            // Você pode fazer isso usando a superglobal $_POST
-            // Por exemplo:
             $team1_score = $_POST['team1_score'];
             $team2_score = $_POST['team2_score'];
 
-            // Agora, precisamos atualizar o jogo com os resultados
-            // Para fazer isso, precisamos chamar uma função em nosso modelo de Jogo
-            // Essa função pode ser algo como `updateResults()`, que ainda precisa ser implementada
             self::updateResults($gameId, $team1_score, $team2_score);
 
-            // Finalmente, redirecione o usuário de volta para a página de detalhes do jogo
             header("Location: /game?id=$gameId");
             exit();
         }
@@ -412,6 +425,9 @@ class GameController
         header('Location: /game?id=' . $id_jogo);
         exit;
     }
+
+
+
 
 
 }

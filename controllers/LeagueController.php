@@ -71,8 +71,23 @@ class LeagueController
         require_once '../views/liga/league.php';
     }
 
+    public static function getLeagueUsers($liga_id){
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT id_utilizador FROM Membros_Liga WHERE id_liga = :liga_id;');
+        $stmt->bindParam(':liga_id', $liga_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $users = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $users[] = $row['id_utilizador'];
+        }
+
+        return $users;
+    }
+
     public static function getLeaguesUser($user_id)
     {
+
         $conn = dbConnect();
         $stmt = $conn->prepare(
             'SELECT Ligas.id, Ligas.nome, Ligas.descricao, Ligas.data_criacao, COUNT(DISTINCT Membros_Liga_Count.id_utilizador) AS membros_ativos
@@ -86,7 +101,7 @@ GROUP BY Ligas.id;'
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+          return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function viewLeague()
@@ -259,7 +274,6 @@ GROUP BY Ligas.id;'
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$result) {
-                // if invite not valid
                 // TODO: deal with error messages
                 Session::setFlashMessage('league_join_error', 'Código de convite inválido');
                 header('Location: /league/join');

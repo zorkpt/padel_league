@@ -10,6 +10,7 @@ require_once '../controllers/UserController.php';
 require_once '../controllers/LeagueController.php';
 require_once '../controllers/GameController.php';
 require_once '../controllers/Session.php';
+require_once '../controllers/NotificationController.php';
 
 
 $request_uri = explode('?', $_SERVER['REQUEST_URI'], 2);
@@ -122,6 +123,12 @@ switch ($request_uri[0]) {
     case '/error';
         HomeController::error();
         break;
+
+    case '/notification/read':
+        NotificationController::handleReadNotification();
+        break;
+
+
 
     default:
         header('HTTP/1.0 404 Not Found');
