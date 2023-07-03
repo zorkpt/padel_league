@@ -1,9 +1,15 @@
 <?php
+require '../vendor/autoload.php';
+use Dotenv\Dotenv;
+
+$dotenv = Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
+
+
 
 const BASE_PATH = __DIR__ . '/../';
 
 require BASE_PATH . 'functions.php';
-
 require_once '../core/Database.php';
 require_once '../controllers/HomeController.php';
 require_once '../controllers/UserController.php';
@@ -11,6 +17,7 @@ require_once '../controllers/LeagueController.php';
 require_once '../controllers/GameController.php';
 require_once '../controllers/Session.php';
 require_once '../controllers/NotificationController.php';
+require_once  '../controllers/Mailer.php';
 
 
 $request_uri = explode('?', $_SERVER['REQUEST_URI'], 2);
