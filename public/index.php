@@ -49,6 +49,15 @@ switch ($request_uri[0]) {
         UserController::changePassword();
         break;
 
+    case '/user/forgot-password':
+        UserController::forgotPassword();
+        break;
+
+    case '/user/redefine-password':
+        UserController::redefinePassword();
+        break;
+
+
     case '/user/updateEmail':
         UserController::changeEmail();
         break;

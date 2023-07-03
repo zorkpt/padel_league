@@ -178,6 +178,7 @@ class UserController
 
     public static function login()
     {
+
         if(isLoggedIn()) {
             header('Location: /dashboard');
             exit;
@@ -373,12 +374,108 @@ class UserController
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public static function getByEmail($email){
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT * FROM Utilizadores WHERE email = :email');
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if (!$user) {
+            return null;
+        }
+
+        return $user;
+    }
+
     public static function logout()
     {
         session_start();
         session_destroy();
         header('Location: /');
         exit;
+    }
+
+    public static function forgotPassword() {
+        if(isset($_POST['email'])) {
+
+            $email = $_POST['email'];
+
+            $user = self::getByEmail($email);
+
+            if($user === null) {
+                Session::setFlashMessage('resetPassword', 'Não encontramos nenhum usuário com esse email.');
+                header('Location: ' . '/user/forgot-password');
+                exit();
+            }
+
+            $resetToken = bin2hex(random_bytes(50));
+
+            self::updateUserResetToken($user,$resetToken);
+
+            $resetLink = 'https://liga-padel.pt/user/redefine-password?token=' . $resetToken;
+            $mailer = new Mailer();
+            $mailer->sendPasswordResetEmail($email, $resetLink);
+
+            Session::setFlashMessage('success', 'Enviamos um email com um link de redefinição de senha.');
+            header('Location: /login');
+            exit;
+        }
+        require_once BASE_PATH . 'views/user/forgot_password.php';
+    }
+
+    public static function updateUserResetToken($user, $resetToken){
+        $resetExpires = date('Y-m-d H:i:s', time() + 3600); // expires in 1 hour
+
+        $conn = dbConnect();
+        $stmt = $conn->prepare('UPDATE Utilizadores SET passwordResetToken = :reset_token, passwordResetExpires = :reset_expires WHERE email = :user_email');
+        $stmt->bindParam(':reset_token', $resetToken);
+        $stmt->bindParam(':reset_expires', $resetExpires);
+        $stmt->bindParam(':user_email', $user->email);
+        $stmt->execute();
+    }
+
+    public static function redefinePassword() {
+        if(isset($_POST['password'])) {
+
+        $newPassword = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+        $conn = dbConnect();
+        $stmt = $conn->prepare('UPDATE Utilizadores SET password_hash = :new_password, passwordResetToken = NULL, passwordResetExpires = NULL WHERE email = :email');
+        $stmt->bindParam(':new_password', $newPassword);
+        $stmt->bindParam(':email', $_SESSION['resetEmail']);
+        $stmt->execute();
+
+        unset($_SESSION['resetEmail']);
+        Session::setFlashMessage('resetPassword', 'A sua senha foi atualizada com sucesso.');
+        header('Location: /login');
+        exit();
+
+        }elseif(isset($_GET['token'])) {
+            $token = $_GET['token'];
+
+            $conn = dbConnect();
+            $stmt = $conn->prepare('SELECT email, passwordResetExpires from Utilizadores where passwordResetToken = :token');
+            $stmt->bindParam(':token', $token);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Verify is token is valid
+            if ($user === false || $user['passwordResetExpires'] < date('Y-m-d H:i:s')) {
+                Session::setFlashMessage('error', 'O token é inválido ou expirou.');
+                header('Location: /error');
+                exit();
+            }
+
+            $_SESSION['resetEmail'] = $user['email'];
+            Session::setFlashMessage('changePassword', 'Por favor introduz uma nova senha');
+            require_once BASE_PATH . 'views/user/redefine_password.php';
+
+        } else {
+            Session::setFlashMessage('error', 'Endereço Inválido');
+            header('Location /error');
+            exit();
+        }
     }
 
 }

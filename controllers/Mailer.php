@@ -78,5 +78,19 @@ class Mailer {
         }
     }
 
+    public function sendPasswordResetEmail($to, $resetLink) {
+        $subject = "Redefinição de Senha - Liga-Padel";
+        $body = $this->generateResetEmailBody($resetLink);
+        $this->sendEmail($to, $subject, $body);
+    }
+
+    private function generateResetEmailBody($resetLink) {
+        $body = "<h1>Redefinição de Senha</h1>";
+        $body .= "<p>Recebemos um pedido para redefinir a tua senha na Liga-Padel.</p>";
+        $body .= "<p>Clica no link abaixo para redefinires a tua senha:</p>";
+        $body .= "<a href='" . htmlspecialchars($resetLink) . "'>Redefinir Senha</a>";
+        $body .= "<p>Se não solicitaste uma redefinição de senha, por favor ignora este e-mail.</p>";
+        return $body;
+    }
 
 }
