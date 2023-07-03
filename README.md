@@ -10,7 +10,7 @@ The objective of the Padel League Management Platform is to create a web-based s
 
 2. **Dynamic League Management:** Enable users to create, join, and manage leagues. Track active league members and their rankings within the league.
 
-3. **Real-Time Messaging:** Implement a messaging system that enables users to communicate with each other within the platform, contributing to a more collaborative and interactive user experience.
+3. **Messaging:** Implement a messaging system that enables users to communicate with each other within the platform, contributing to a more collaborative and interactive user experience.
 
 4. **League-Specific Chat System:** Each league should have its own dedicated chat for discussions related to matches, strategies, and other league-specific topics.
 
