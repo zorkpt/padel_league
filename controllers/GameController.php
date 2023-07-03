@@ -18,11 +18,6 @@ class GameController
         require_once BASE_PATH . 'views/jogo/game_schedule.php';
     }
 
-    public static function index()
-    {
-        require_once BASE_PATH . 'views/jogo/game.php';
-    }
-
     public static function addGame()
     {
         // Check if the form is submitted

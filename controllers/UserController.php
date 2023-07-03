@@ -57,6 +57,9 @@ class UserController
 
                 $stmt->execute();
 
+                $mailer = new Mailer();
+                $mailer->sendWelcomeEmail($email, $username);
+
                 header('Location: /login');
             } else {
                 $_SESSION['errors'] = $errors;
