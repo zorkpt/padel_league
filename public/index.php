@@ -5,8 +5,6 @@ use Dotenv\Dotenv;
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 
-
-
 const BASE_PATH = __DIR__ . '/../';
 
 require BASE_PATH . 'functions.php';

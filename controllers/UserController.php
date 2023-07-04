@@ -4,7 +4,6 @@ class UserController
 {
     public static function register()
     {
-        $errors = [];
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $username = $_POST['username'];
             $email = $_POST['email'];
@@ -12,38 +11,43 @@ class UserController
             $avatar = $_FILES['avatar'];
             $created_date = date("Y-m-d H:i:s");
 
-            // Verificando campos de usuário e senha
-            if(empty($username)) {
-                $errors['username'] = "Nome de usuário é obrigatório.";
+            // store username and email to fill the form in case of fail
+            $_SESSION['old']['username'] = $username;
+            $_SESSION['old']['email'] = $email;
+
+            if (empty($username)) {
+                Session::setFlashMessage('username', "Nome de usuário é obrigatório.");
             } else if(strlen($username) < 3) {
-                $errors['username'] = "Nome de usuário deve ter pelo menos 3 caracteres.";
+                Session::setFlashMessage('username', "Nome de usuário deve ter pelo menos 3 caracteres.");
             } else {
                 $userExists = self::checkUserExists($username);
                 if($userExists) {
-                    $errors['username'] = "Nome de usuário já está em uso.";
+                    Session::setFlashMessage('username', "Nome de usuário já está em uso.");
                 }
             }
             if(empty($email)){
-                $errors['email'] = "E-mail é obrigatorio";
+                Session::setFlashMessage('email', "E-mail é obrigatorio");
             }else {
                 $emailExists = self::checkEmailExists($email);
                 if($emailExists){
-                    $errors['email'] = "E-mail já está em uso.";
+                    Session::setFlashMessage('email', "E-mail já está em uso.");
                 }
             }
 
             if(empty($password)) {
-                $errors['password'] = "Senha é obrigatória.";
+                Session::setFlashMessage('password', "Senha é obrigatória.");
             }
 
             list($avatarDestination, $avatarErrors) = self::handleAvatarUpload($avatar);
 
             if (!empty($avatarErrors)) {
-                $errors = array_merge($errors, $avatarErrors);
+                foreach ($avatarErrors as $error) {
+                    Session::setFlashMessage('avatar', $error);
+                }
             }
 
-            // Caso não existam erros, insere os dados na base de dados
-            if (empty($errors)) {
+            // Verify is there are errors and insert user on db
+            if (!Session::hasFlash('username') && !Session::hasFlash('email') && !Session::hasFlash('password') && !Session::hasFlash('avatar')) {
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
                 $conn = dbConnect();
@@ -61,8 +65,6 @@ class UserController
                 $mailer->sendWelcomeEmail($email, $username);
 
                 header('Location: /login');
-            } else {
-                $_SESSION['errors'] = $errors;
             }
         }
 
