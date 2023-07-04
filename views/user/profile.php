@@ -39,10 +39,10 @@
                 <table class="table-auto">
                     <thead>
                     <tr>
-                        <th class="px-4 py-2">Nome da Liga</th>
+                        <th class="px-4 py-2">Liga</th>
                         <th class="px-4 py-2">Descrição</th>
 
-                        <th class="px-4 py-2">Membros Ativos</th>
+                        <th class="px-4 py-2">Membros</th>
                     </tr>
                     </thead>
                     <tbody>

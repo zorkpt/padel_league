@@ -7,8 +7,8 @@ class LeagueController
     public static function create()
     {
         // verify if user is logged in
-        if(!isLoggedIn()) {
-            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
+        if (!isLoggedIn()) {
+            SessionController::setFlashMessage('login', 'Tens de estar ligado para ver esta página');
             header('Location: /login');
             exit;
         }
@@ -55,7 +55,8 @@ class LeagueController
     }
 
 
-    public static function generateRandomInviteCode($length = 5) {
+    public static function generateRandomInviteCode($length = 5)
+    {
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
@@ -66,12 +67,8 @@ class LeagueController
     }
 
 
-    public static function index()
+    public static function getLeagueUsers($liga_id)
     {
-        require_once '../views/liga/league.php';
-    }
-
-    public static function getLeagueUsers($liga_id){
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT id_utilizador FROM Membros_Liga WHERE id_liga = :liga_id;');
         $stmt->bindParam(':liga_id', $liga_id, PDO::PARAM_INT);
@@ -101,14 +98,14 @@ GROUP BY Ligas.id;'
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
 
-          return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function viewLeague()
     {
         // verify if user is logged in
-        if(!isLoggedIn()) {
-            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
+        if (!isLoggedIn()) {
+            SessionController::setFlashMessage('login', 'Tens de estar ligado para ver esta página');
             header('Location: /login');
             exit;
         }
@@ -118,38 +115,37 @@ GROUP BY Ligas.id;'
             $user_id = $_SESSION['user']['id'];
             // Verify if user is a member of the league
             if (!self::isUserMemberOfLeague($user_id, $league_id)) {
-                SessionController::setFlashMessage('access_error', 'Você não é um membro desta liga.');
+                SessionController::setFlashMessage('access_error', 'Tu não és membro desta liga.');
                 header('Location: /error');
                 exit();
             }
 
-            // Get the league details
+            // Get all league data
             $leagueDetails = self::getLeagueInfo($league_id);
 
-            // Get the League Games
             $leagueGames = self::getLeagueGames($league_id);
-            // Get the league members
+
             $leagueMembers = self::getLeagueMembers($league_id);
 
-            $openLeagueGames = self::getLeagueGames($league_id,GAME_STATUS_OPEN);
+            $openLeagueGames = self::getLeagueGames($league_id, GAME_STATUS_OPEN);
 
             $ongoingLeagueGames = self::getLeagueGames($league_id, GAME_STATUS_ONGOING);
 
             $inviteCode = self::getInviteCode($league_id);
 
             $lastFiveGames = self::lastGames($league_id);
-            //Get the league rankings
+
             $ranking = self::getPlayerRankings($league_id);
 
-
-
             require_once '../views/liga/league.php';
+
         } else {
             header('Location: /error');
         }
     }
 
-    public static function getInviteCode($league_id) {
+    public static function getInviteCode($league_id)
+    {
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT codigo_convite FROM Ligas WHERE id = :league_id');
         $stmt->bindParam(':league_id', $league_id);
@@ -158,7 +154,9 @@ GROUP BY Ligas.id;'
         return $stmt->fetch(PDO::FETCH_ASSOC);
 
     }
-    public static function lastGames($league_id){
+
+    public static function lastGames($league_id)
+    {
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT * FROM Jogos WHERE id_liga = :league_id AND status = :game_status ORDER BY data_hora DESC LIMIT 5');
         $stmt->bindParam(':league_id', $league_id);
@@ -166,7 +164,7 @@ GROUP BY Ligas.id;'
         $stmt->execute();
         $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach($games as &$game) {
+        foreach ($games as &$game) {
             $players = GameController::getPlayersInGame($game['id']);
             $game['players'] = $players;
         }
@@ -187,7 +185,8 @@ GROUP BY Ligas.id;'
         return $membership != false;  // return true if its a member, false otherwise
     }
 
-    public static function getLeagueInfo($league_id) {
+    public static function getLeagueInfo($league_id)
+    {
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT nome, descricao, id_criador, data_criacao FROM Ligas WHERE id = :league_id');
         $stmt->bindParam(':league_id', $league_id, PDO::PARAM_INT);
@@ -200,7 +199,8 @@ GROUP BY Ligas.id;'
         return array_merge($leagueInfo, $creatorData);
     }
 
-    public static function getLeagueMembers($league_id) {
+    public static function getLeagueMembers($league_id)
+    {
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT nome_utilizador, id, avatar FROM Utilizadores JOIN Membros_Liga ON Utilizadores.id = Membros_Liga.id_utilizador WHERE Membros_Liga.id_liga = :league_id');
         $stmt->bindParam(':league_id', $league_id);
@@ -208,7 +208,8 @@ GROUP BY Ligas.id;'
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function getLeagueGames($league_id, $status_filter = null) {
+    public static function getLeagueGames($league_id, $status_filter = null)
+    {
         $conn = dbConnect();
         $query = 'SELECT Jogos.id, Jogos.local, Jogos.data_hora, Jogos.status, 
           GROUP_CONCAT(Utilizadores.nome_utilizador ORDER BY Jogadores_Jogo.equipa ASC) as jogadores 
@@ -221,7 +222,7 @@ GROUP BY Ligas.id;'
             $query .= ' AND Jogos.status = :status_filter';
         }
 
-        $query .= ' GROUP BY Jogos.id ORDER BY Jogos.data_hora DESC';
+        $query .= ' GROUP BY Jogos.id ORDER BY Jogos.data_hora ASC';
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':league_id', $league_id);
 
@@ -234,9 +235,8 @@ GROUP BY Ligas.id;'
     }
 
 
-
-
-    public static function getPlayerRankings($league_id) {
+    public static function getPlayerRankings($league_id)
+    {
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT Ranking.id_utilizador, Utilizadores.nome_utilizador, Utilizadores.avatar, Ranking.pontos as total_pontuacao, Ranking.jogos_jogados, Ranking.jogos_ganhos as vitorias, Ranking.jogos_perdidos as derrotas, (Ranking.jogos_ganhos / Ranking.jogos_jogados * 100) as win_rate FROM Ranking
     JOIN Utilizadores ON Ranking.id_utilizador = Utilizadores.id
@@ -248,18 +248,18 @@ GROUP BY Ligas.id;'
     }
 
 
-    public static function joinLeague() {
+    public static function joinLeague()
+    {
         // verify if user is logged in
-        if(!isLoggedIn()) {
-            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
+        if (!isLoggedIn()) {
+            SessionController::setFlashMessage('login', 'Tens de estar ligado para ver esta página');
             header('Location: /login');
             exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             require_once '../views/liga/join.php';
-        }
-        else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $invite_code = $_POST['invite_code'];
 

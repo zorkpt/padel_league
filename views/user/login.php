@@ -13,11 +13,12 @@
             <div class="space-y-12">
                 <div class="border-b border-gray-900/10 pb-12">
                         <div class="sm:col-span-4">
-                            <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Nome de Utilizador</label>
+                            <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Nome de Utilizador</label>
                             <div class="mt-2">
-                                <input id="username" name="username" autocomplete="username"
+                                <input id="username" name="username" autocomplete="username" value="<?php echo $_SESSION['old']['username'] ?? '';?>"
                                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                             </div>
+                            <?php unset($_SESSION['old']['user']); ?>
                         </div>
                         <div class="sm:col-span-4">
                             <label for="password"

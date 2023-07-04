@@ -1,2 +1,6 @@
 - ao registar, verificar se nome de utilizador e email ja estão em uso
 - limitar criação de novas ligas so a quem estava logged
+
+
+
+- Na vista da liga quando abrimos o perfil de um jogador, colocar um botao para voltar á liga onde estavamos anteriormente.

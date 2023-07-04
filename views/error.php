@@ -5,14 +5,17 @@
 
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-
         <?php if ($errorMessage = SessionController::getFlash('error')): ?>
             <div class="text-red-500 mt-2 text-sm">
                 <?php echo $errorMessage; ?>
             </div>
         <?php endif; ?>
 
-
+        <?php if ($errorMessage = SessionController::getFlash('access_error')): ?>
+            <div class="text-red-500 mt-2 text-sm">
+                <?php echo $errorMessage; ?>
+            </div>
+        <?php endif; ?>
 
     </div>
 </main>

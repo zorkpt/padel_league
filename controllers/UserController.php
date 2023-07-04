@@ -192,6 +192,9 @@ class UserController
             $username = $_POST['username'];
             $password = $_POST['password'];
 
+            $_SESSION['old']['username'] = $username;
+
+
             $conn = dbConnect();
             $stmt = $conn->prepare('SELECT id, nome_utilizador, password_hash, email, avatar FROM Utilizadores WHERE nome_utilizador = :username');
             $stmt->bindParam(':username', $username);
