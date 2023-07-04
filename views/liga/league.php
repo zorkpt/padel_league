@@ -18,7 +18,7 @@ extract($ranking);
 
             <!--League Info-->
             <div class="bg-white shadow-md rounded-lg p-6">
-                <h2 class="text-2xl font-bold mb-4">Informações da Liga</h2>
+                <h2 class="text-2xl font-bold mb-4">Informações</h2>
                 <div class="space-y-3">
                     <div class="flex items-center space-x-2">
                         <p><span class="font-semibold">Criador da Liga:</span> <img class="w-8 h-8 rounded-full"
@@ -121,7 +121,7 @@ extract($ranking);
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
             <!--Ranking-->
             <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-2">
-                <h2 class="text-2xl font-bold mb-2">Classificação da Liga</h2>
+                <h2 class="text-2xl font-bold mb-2">Classificação</h2>
                 <div class="overflow-y-auto max-h-[300px]">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead>
@@ -147,7 +147,8 @@ extract($ranking);
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['jogos_jogados'] ?></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['vitorias'] ?></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['derrotas'] ?></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['win_rate'] ?>%
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= number_format($row['win_rate'], 2) ?>
+                                    %
                                 </td>
                             </tr>
                         <?php endforeach; ?>
