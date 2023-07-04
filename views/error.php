@@ -6,7 +6,7 @@
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
 
-        <?php if ($errorMessage = Session::getFlash('error')): ?>
+        <?php if ($errorMessage = SessionController::getFlash('error')): ?>
             <div class="text-red-500 mt-2 text-sm">
                 <?php echo $errorMessage; ?>
             </div>

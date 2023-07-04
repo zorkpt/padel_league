@@ -16,38 +16,38 @@ class UserController
             $_SESSION['old']['email'] = $email;
 
             if (empty($username)) {
-                Session::setFlashMessage('username', "Nome de usuário é obrigatório.");
+                SessionController::setFlashMessage('username', "Nome de usuário é obrigatório.");
             } else if(strlen($username) < 3) {
-                Session::setFlashMessage('username', "Nome de usuário deve ter pelo menos 3 caracteres.");
+                SessionController::setFlashMessage('username', "Nome de usuário deve ter pelo menos 3 caracteres.");
             } else {
                 $userExists = self::checkUserExists($username);
                 if($userExists) {
-                    Session::setFlashMessage('username', "Nome de usuário já está em uso.");
+                    SessionController::setFlashMessage('username', "Nome de usuário já está em uso.");
                 }
             }
             if(empty($email)){
-                Session::setFlashMessage('email', "E-mail é obrigatorio");
+                SessionController::setFlashMessage('email', "E-mail é obrigatorio");
             }else {
                 $emailExists = self::checkEmailExists($email);
                 if($emailExists){
-                    Session::setFlashMessage('email', "E-mail já está em uso.");
+                    SessionController::setFlashMessage('email', "E-mail já está em uso.");
                 }
             }
 
             if(empty($password)) {
-                Session::setFlashMessage('password', "Senha é obrigatória.");
+                SessionController::setFlashMessage('password', "Senha é obrigatória.");
             }
 
             list($avatarDestination, $avatarErrors) = self::handleAvatarUpload($avatar);
 
             if (!empty($avatarErrors)) {
                 foreach ($avatarErrors as $error) {
-                    Session::setFlashMessage('avatar', $error);
+                    SessionController::setFlashMessage('avatar', $error);
                 }
             }
 
             // Verify is there are errors and insert user on db
-            if (!Session::hasFlash('username') && !Session::hasFlash('email') && !Session::hasFlash('password') && !Session::hasFlash('avatar')) {
+            if (!SessionController::hasFlash('username') && !SessionController::hasFlash('email') && !SessionController::hasFlash('password') && !SessionController::hasFlash('avatar')) {
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
                 $conn = dbConnect();
@@ -61,7 +61,7 @@ class UserController
 
                 $stmt->execute();
 
-                $mailer = new Mailer();
+                $mailer = new MailerController();
                 $mailer->sendWelcomeEmail($email, $username);
 
                 header('Location: /login');
@@ -100,7 +100,7 @@ class UserController
     {
         // verify if user is logged in
         if(!isLoggedIn()) {
-            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
             header('Location: /login');
             exit;
         }
@@ -124,11 +124,11 @@ class UserController
             $_SESSION['user']['avatar'] = $avatarPath;
 
             // Set a success message
-            Session::setFlashMessage('success_avatar_message', 'O avatar foi atualizado com sucesso!');
+            SessionController::setFlashMessage('success_avatar_message', 'O avatar foi atualizado com sucesso!');
 
         } catch (Exception $e) {
             // Set an error message
-            Session::setFlashMessage('avatar', $e->getMessage());
+            SessionController::setFlashMessage('avatar', $e->getMessage());
         }
 
         // Redirect back to the profile page
@@ -221,7 +221,7 @@ class UserController
     {
         // verify if user is logged in
         if(!isLoggedIn()) {
-            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
             header('Location: /login');
             exit;
         }
@@ -233,7 +233,7 @@ class UserController
             $confirm_new_password = $_POST['confirm_new_password'];
 
             if ($new_password != $confirm_new_password) {
-                Session::setFlashMessage('password', 'As senhas não são iguais');
+                SessionController::setFlashMessage('password', 'As senhas não são iguais');
                 header("Location: /settings");
                 exit();
             }
@@ -246,7 +246,7 @@ class UserController
             $user = $stmt->fetch();
 
             if (!password_verify($old_password, $user['password_hash'])) {
-                Session::setFlashMessage('password', 'A senha antiga está incorreta.');
+                SessionController::setFlashMessage('password', 'A senha antiga está incorreta.');
                 header("Location: /settings");
                 exit();
             }
@@ -258,7 +258,7 @@ class UserController
             $stmt->bindParam(':password', $newPasswordHash);
             $stmt->execute();
 
-            Session::setFlashMessage('success_message', 'Senha alterada com sucesso.');
+            SessionController::setFlashMessage('success_message', 'Senha alterada com sucesso.');
             header('Location: /settings');
 
         }
@@ -269,7 +269,7 @@ class UserController
     {
         // verify if user is logged in
         if(!isLoggedIn()) {
-            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
             header('Location: /login');
             exit;
         }
@@ -278,7 +278,7 @@ class UserController
             $newMail = $_POST['email'];
 
             if(!filter_var($newMail, FILTER_VALIDATE_EMAIL) || empty($newMail)) {
-                Session::setFlashMessage('email','Formato de e-mail inválido.');
+                SessionController::setFlashMessage('email','Formato de e-mail inválido.');
                 header('Location: /settings');
                 exit();
             }
@@ -291,7 +291,7 @@ class UserController
 
             if ($existingEmail) {
 
-                Session::setFlashMessage('email', 'Este e-mail já está em uso.');
+                SessionController::setFlashMessage('email', 'Este e-mail já está em uso.');
                 header('Location: /settings');
                 exit();
             }
@@ -304,7 +304,7 @@ class UserController
 
             $_SESSION['user']['email'] = $newMail;
 
-            Session::setFlashMessage('success_mail_message', 'E-mail alterado com sucesso.');
+            SessionController::setFlashMessage('success_mail_message', 'E-mail alterado com sucesso.');
             header('Location: /settings');
 
         }
@@ -324,7 +324,7 @@ class UserController
     public static function settings()
     {
         if (!isLoggedIn()) {
-            Session::setFlashMessage('login', 'Faz Login para ver esta página');
+            SessionController::setFlashMessage('login', 'Faz Login para ver esta página');
             header('Location: /login');
             exit;
         }
@@ -406,7 +406,7 @@ class UserController
             $user = self::getByEmail($email);
 
             if($user === null) {
-                Session::setFlashMessage('resetPassword', 'Não encontramos nenhum usuário com esse email.');
+                SessionController::setFlashMessage('resetPassword', 'Não encontramos nenhum usuário com esse email.');
                 header('Location: ' . '/user/forgot-password');
                 exit();
             }
@@ -416,10 +416,10 @@ class UserController
             self::updateUserResetToken($user,$resetToken);
 
             $resetLink = 'https://liga-padel.pt/user/redefine-password?token=' . $resetToken;
-            $mailer = new Mailer();
+            $mailer = new MailerController();
             $mailer->sendPasswordResetEmail($email, $resetLink);
 
-            Session::setFlashMessage('success', 'Enviamos um email com um link de redefinição de senha.');
+            SessionController::setFlashMessage('success', 'Enviamos um email com um link de redefinição de senha.');
             header('Location: /login');
             exit;
         }
@@ -449,7 +449,7 @@ class UserController
         $stmt->execute();
 
         unset($_SESSION['resetEmail']);
-        Session::setFlashMessage('resetPassword', 'A sua senha foi atualizada com sucesso.');
+        SessionController::setFlashMessage('resetPassword', 'A sua senha foi atualizada com sucesso.');
         header('Location: /login');
         exit();
 
@@ -464,17 +464,17 @@ class UserController
 
             // Verify is token is valid
             if ($user === false || $user['passwordResetExpires'] < date('Y-m-d H:i:s')) {
-                Session::setFlashMessage('error', 'O token é inválido ou expirou.');
+                SessionController::setFlashMessage('error', 'O token é inválido ou expirou.');
                 header('Location: /error');
                 exit();
             }
 
             $_SESSION['resetEmail'] = $user['email'];
-            Session::setFlashMessage('changePassword', 'Por favor introduz uma nova senha');
+            SessionController::setFlashMessage('changePassword', 'Por favor introduz uma nova senha');
             require_once BASE_PATH . 'views/user/redefine_password.php';
 
         } else {
-            Session::setFlashMessage('error', 'Endereço Inválido');
+            SessionController::setFlashMessage('error', 'Endereço Inválido');
             header('Location /error');
             exit();
         }

@@ -13,9 +13,9 @@ require_once '../controllers/HomeController.php';
 require_once '../controllers/UserController.php';
 require_once '../controllers/LeagueController.php';
 require_once '../controllers/GameController.php';
-require_once '../controllers/Session.php';
+require_once '../controllers/SessionController.php';
 require_once '../controllers/NotificationController.php';
-require_once  '../controllers/Mailer.php';
+require_once  '../controllers/MailerController.php';
 
 
 $request_uri = explode('?', $_SERVER['REQUEST_URI'], 2);

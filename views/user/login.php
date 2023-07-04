@@ -31,7 +31,7 @@
                                     <?php echo $_SESSION['errors']['login']; ?>
                                 </div>
                             <?php endif; ?>
-                            <?php if ($validMessage = Session::getFlash('resetPassword')): ?>
+                            <?php if ($validMessage = SessionController::getFlash('resetPassword')): ?>
                             <div class="text-green-500 mt-2 text-sm">
                                 <?php echo $validMessage; ?>
                             </div>

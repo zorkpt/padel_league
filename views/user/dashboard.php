@@ -1,6 +1,6 @@
 <?php require BASE_PATH . "/views/partials/head.php"; ?>
 <?php require BASE_PATH . "/views/partials/nav.php"; ?>
-<?php Session::start(); ?>
+<?php SessionController::start(); ?>
 <?php $header = 'Dashboard'; ?>
 <?php require BASE_PATH . "/views/partials/banner.php"; ?>
 <?php

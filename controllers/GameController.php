@@ -10,7 +10,7 @@ class GameController
     {
         // verify if user is logged in
         if(!isLoggedIn()) {
-            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
             header('Location: /login');
             exit;
         }
@@ -27,7 +27,7 @@ class GameController
 
             // Verify if user is a member of the league
             if (!LeagueController::isUserMemberOfLeague($user_id, $league_id)) {
-                Session::setFlashMessage('access_error', 'Não és um membro desta liga.');
+                SessionController::setFlashMessage('access_error', 'Não és um membro desta liga.');
                 header('Location: /error');
                 exit();
             }

@@ -11,7 +11,7 @@ class HomeController {
 
     public static function error() {
         $errors = [];
-        $errors = Session::getFlash('access_error');
+        $errors = SessionController::getFlash('access_error');
 
         require_once  BASE_PATH . 'views/error.php';
     }

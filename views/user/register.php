@@ -2,7 +2,7 @@
 <?php require BASE_PATH . "/views/partials/nav.php"; ?>
 <?php $header = 'Registo'; ?>
 <?php require BASE_PATH . "/views/partials/banner.php"; ?>
-<?php Session::start(); ?>
+<?php SessionController::start(); ?>
 
 <main>
 
@@ -25,7 +25,7 @@
                                            placeholder="nomedeutilizador">
                                 </div>
                             </div>
-                            <?php if ($username_errors = Session::getFlash('username')): ?>
+                            <?php if ($username_errors = SessionController::getFlash('username')): ?>
                                 <div class="text-red-500 mt-2 text-sm">
                                     <?= $username_errors ?>
                                 </div>
@@ -40,7 +40,7 @@
                                 <input id="email" name="email" type="email" autocomplete="email" value="<?php echo $_SESSION['old']['email'] ?? ''; ?>"
                                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                             </div>
-                            <?php if ($email_errors = Session::getFlash('email')): ?>
+                            <?php if ($email_errors = SessionController::getFlash('email')): ?>
                                 <div class="text-red-500 mt-2 text-sm">
                                     <?= $email_errors ?>
                                 </div>
@@ -54,7 +54,7 @@
                                 <input id="password" name="password" type="password" autocomplete="current-password"
                                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                             </div>
-                            <?php if ($password_errors = Session::getFlash('password')): ?>
+                            <?php if ($password_errors = SessionController::getFlash('password')): ?>
                                 <div class="text-red-500 mt-2 text-sm">
                                     <?= $password_errors ?>
                                 </div>

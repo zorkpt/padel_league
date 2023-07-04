@@ -6,9 +6,9 @@
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
         <!-- Verificando se existe alguma mensagem de erro -->
-        <?php if (Session::getFlash('league_join_error')): ?>
+        <?php if (SessionController::getFlash('league_join_error')): ?>
             <div class="error-message">
-                <?php echo Session::getFlash('league_join_error'); ?>
+                <?php echo SessionController::getFlash('league_join_error'); ?>
             </div>
         <?php endif; ?>
 

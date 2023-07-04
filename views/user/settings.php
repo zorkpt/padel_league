@@ -18,12 +18,12 @@
                 <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                        type="email" id="email" name="email" value="<?= $_SESSION['user']['email'] ?>"><br>
                 <div class="mt-6 flex items-center justify-end gap-x-6">
-                    <?php if ($message = Session::getFlash('email')): ?>
+                    <?php if ($message = SessionController::getFlash('email')): ?>
                         <div class="text-red-500 mt-2 text-sm">
                             <?php echo $message; ?>
                         </div>
                     <?php endif; ?>
-                    <?php if ($message = Session::getFlash('success_mail_message')): ?>
+                    <?php if ($message = SessionController::getFlash('success_mail_message')): ?>
                         <div class="text-green-500 mt-2 text-sm">
                             <?php echo $message; ?>
                         </div>
@@ -39,12 +39,12 @@
             <form method="post" action="/user/updateAvatar" enctype="multipart/form-data">
                 <label class="block text-sm font-medium leading-6 text-gray-900" for="avatar">Avatar:</label><br>
                 <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="file" id="avatar" name="avatar"><br>
-                <?php if ($message = Session::getFlash('avatar')): ?>
+                <?php if ($message = SessionController::getFlash('avatar')): ?>
                     <div class="text-red-500 mt-2 text-sm">
                         <?php echo $message; ?>
                     </div>
                 <?php endif; ?>
-                <?php if ($message = Session::getFlash('success_avatar_message')): ?>
+                <?php if ($message = SessionController::getFlash('success_avatar_message')): ?>
                     <div class="text-green-500 mt-2 text-sm">
                         <?php echo $message; ?>
                     </div>
@@ -66,12 +66,12 @@
                 <label class="block text-sm font-medium leading-6 text-gray-900" for="confirm_new_password">Confirmar Nova senha:</label><br>
                 <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="confirm_new_password" name="confirm_new_password"><br>
 
-                <?php if ($message = Session::getFlash('password')): ?>
+                <?php if ($message = SessionController::getFlash('password')): ?>
                     <div class="text-red-500 mt-2 text-sm">
                         <?php echo $message; ?>
                     </div>
                 <?php endif; ?>
-                <?php if ($message = Session::getFlash('success_mail_message')): ?>
+                <?php if ($message = SessionController::getFlash('success_mail_message')): ?>
                     <div class="text-green-500 mt-2 text-sm">
                         <?php echo $message; ?>
                     </div>

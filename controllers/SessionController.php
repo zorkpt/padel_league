@@ -1,6 +1,6 @@
 <?php
 
-class Session
+class SessionController
 {
     public static function start()
     {

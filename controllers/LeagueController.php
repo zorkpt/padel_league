@@ -8,7 +8,7 @@ class LeagueController
     {
         // verify if user is logged in
         if(!isLoggedIn()) {
-            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
             header('Location: /login');
             exit;
         }
@@ -24,7 +24,7 @@ class LeagueController
             $invite_code = self::generateRandomInviteCode();
 
             if (empty($name) || empty($description)) {
-                Session::setFlashMessage('league_error', 'Os campos não podem estar vazios');
+                SessionController::setFlashMessage('league_error', 'Os campos não podem estar vazios');
                 header('Location: /leagues/create');
                 exit();
             }
@@ -108,7 +108,7 @@ GROUP BY Ligas.id;'
     {
         // verify if user is logged in
         if(!isLoggedIn()) {
-            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
             header('Location: /login');
             exit;
         }
@@ -118,7 +118,7 @@ GROUP BY Ligas.id;'
             $user_id = $_SESSION['user']['id'];
             // Verify if user is a member of the league
             if (!self::isUserMemberOfLeague($user_id, $league_id)) {
-                Session::setFlashMessage('access_error', 'Você não é um membro desta liga.');
+                SessionController::setFlashMessage('access_error', 'Você não é um membro desta liga.');
                 header('Location: /error');
                 exit();
             }
@@ -251,7 +251,7 @@ GROUP BY Ligas.id;'
     public static function joinLeague() {
         // verify if user is logged in
         if(!isLoggedIn()) {
-            Session::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
             header('Location: /login');
             exit;
         }
@@ -275,7 +275,7 @@ GROUP BY Ligas.id;'
 
             if (!$result) {
                 // TODO: deal with error messages
-                Session::setFlashMessage('league_join_error', 'Código de convite inválido');
+                SessionController::setFlashMessage('league_join_error', 'Código de convite inválido');
                 header('Location: /league/join');
                 exit();
             }

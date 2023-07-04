@@ -2,7 +2,7 @@
 <?php require BASE_PATH . "/views/partials/nav.php"; ?>
 <?php $header = 'Registo'; ?>
 <?php require BASE_PATH . "/views/partials/banner.php"; ?>
-<?php Session::start(); ?>
+<?php SessionController::start(); ?>
 
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
