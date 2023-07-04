@@ -23,8 +23,15 @@ class Session
             unset($_SESSION['flash'][$key]);
             return $message;
         }
-        return null;
+        return [];
     }
+
+    public static function hasFlash($key)
+    {
+        self::start();
+        return isset($_SESSION['flash'][$key]);
+    }
+
 
 
 }
