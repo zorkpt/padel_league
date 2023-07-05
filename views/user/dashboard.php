@@ -9,7 +9,7 @@ extract($leagues);
 
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="min-w-full divide-y shadow-md divide-gray-200">
             <thead class="bg-gray-50">
             <tr class="text-center">
                 <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Nome da Liga</th>

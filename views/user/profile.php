@@ -14,7 +14,7 @@
 
                 <!-- Avatar -->
 
-                <div class="w-32 h-32 mb-4 rounded-full bg-gray-400"><img alt="avatar" class="rounded-full" src="<?= $_SESSION['user']['avatar']; ?>"> </div>
+                <div class="w-32 h-32 mb-4 rounded-full bg-gray-400"><img alt="avatar" class="rounded" src="<?= $_SESSION['user']['avatar']; ?>"> </div>
 
                 <!-- Nome do utilizador -->
 <!--                --><?php //dd($user_name); ?>

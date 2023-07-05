@@ -202,7 +202,7 @@ GROUP BY Ligas.id;'
     public static function getLeagueMembers($league_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT nome_utilizador, id, avatar FROM Utilizadores JOIN Membros_Liga ON Utilizadores.id = Membros_Liga.id_utilizador WHERE Membros_Liga.id_liga = :league_id');
+        $stmt = $conn->prepare('SELECT Utilizadores.nome_utilizador, Utilizadores.id, Utilizadores.avatar, Membros_Liga.data_admissao FROM Utilizadores JOIN Membros_Liga ON Utilizadores.id = Membros_Liga.id_utilizador WHERE Membros_Liga.id_liga = :league_id');
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -92,6 +92,11 @@ class GameController
 
     public static function show()
     {
+        if(!isLoggedIn()){
+            SessionController::setFlashMessage('login', 'Tens de estar ligado para ver esta página');
+            header('Location: /login');
+            exit();
+        }
 
         $game_id = $_GET['id'];
         $currentUserId = $_SESSION['user']['id'];

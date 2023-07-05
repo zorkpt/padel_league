@@ -8,6 +8,7 @@ class UserController
             $username = $_POST['username'];
             $email = $_POST['email'];
             $password = $_POST['password'];
+            $confirmPassword = $_POST['confirm-password'];
             $avatar = $_FILES['avatar'];
             $created_date = date("Y-m-d H:i:s");
 
@@ -36,6 +37,8 @@ class UserController
 
             if(empty($password)) {
                 SessionController::setFlashMessage('password', "Senha é obrigatória.");
+            }elseif ($password != $confirmPassword){
+                SessionController::setFlashMessage('password', 'As senhas não são iguais.');
             }
 
             list($avatarDestination, $avatarErrors) = self::handleAvatarUpload($avatar);

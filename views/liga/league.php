@@ -21,13 +21,13 @@ extract($ranking);
                 <h2 class="text-2xl font-bold mb-4">Informações</h2>
                 <div class="space-y-3">
                     <div class="flex items-center space-x-2">
-                        <p><span class="font-semibold">Criador da Liga:</span> <img class="w-8 h-8 rounded-full"
-                                                                                    src="<?= $leagueDetails['avatar'] ?>"
-                                                                                    alt="Avatar do criador"><?= htmlspecialchars($leagueDetails['nome_utilizador']) ?>
+                        <p><span class="font-semibold">Gestor da Liga:</span> <img class="w-8 h-8 rounded-full"
+                                                                                   src="<?= $leagueDetails['avatar'] ?>"
+                                                                                   alt="Avatar do criador"><?= htmlspecialchars($leagueDetails['nome_utilizador']) ?>
                         </p>
                     </div>
                     <p>
-                        <span class="font-semibold">Data de Criação:</span> <?= htmlspecialchars((new DateTime($leagueDetails['data_criacao']))->format("d/m/Y")) ?>
+                        <span class="font-semibold">Criada em:</span> <?= htmlspecialchars((new DateTime($leagueDetails['data_criacao']))->format("d/m/Y")) ?>
 
                     </p>
                     <p>
@@ -65,14 +65,14 @@ extract($ranking);
                                                      src="<?= $player['avatar'] ?>"
                                                      alt="Avatar de
                                                         <?= htmlspecialchars($player['nome_utilizador']) ?>">
-                                                <span class="font-bold"><?= htmlspecialchars($player['nome_utilizador']) ?></span>
+                                                <span><?= htmlspecialchars($player['nome_utilizador']) ?></span>
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
 
                                     <!--Score-->
                                     <div class="mx-2">
-                                        <span class="font-bold"><?= $game['team1_score'] ?> - <?= $game['team2_score'] ?></span>
+                                        <span><?= $game['team1_score'] ?> - <?= $game['team2_score'] ?></span>
                                     </div>
 
                                     <!--Team 2-->
@@ -83,7 +83,7 @@ extract($ranking);
                                                      src="<?= $player['avatar'] ?>"
                                                      alt="Avatar de
                                                          <?= htmlspecialchars($player['nome_utilizador']) ?>">
-                                                <span class="font-bold"><?= htmlspecialchars($player['nome_utilizador']) ?></span>
+                                                <span><?= htmlspecialchars($player['nome_utilizador']) ?></span>
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
@@ -192,9 +192,14 @@ extract($ranking);
                                     <?= count(GameController::getPlayersInGame($game['id'])) ?>/4
                                 </td>
 
-                                <td class="mb-4 inline-block px-3 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">
-                                    <a href="/game?id=
-                            <?= htmlspecialchars($game['id']) ?>">Ver Jogo</a></td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center">
+                                        <a class="inline-flex items-center justify-center px-4 py-2 text-xs font-medium text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none min-w-[60px] min-h-[30px]"
+                                           href="/game?id=<?= htmlspecialchars($game['id']) ?>">Abrir</a>
+                                    </div>
+                                </td>
+
+
                             </tr>
                         <?php } ?>
                         </tbody>
@@ -210,7 +215,6 @@ extract($ranking);
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                         <tr>
-                        <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Data
                             </th>
@@ -224,20 +228,19 @@ extract($ranking);
                                 Ações
                             </th>
                         </tr>
-                        </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                         <?php foreach ($ongoingLeagueGames as $game) { ?>
-                            <tr class="text-center">
+                            <tr>
                                 <td class="px-6 py-4 items-center"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("d/m/Y")) ?></td>
                                 <td class="px-6 py-4 items-center"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("H:i")) ?></td>
                                 <td class="px-6 py-4 items-center"><?= htmlspecialchars($game['local']) ?></td>
 
                                 <td class="px-6 py-4 items-center">
-                                    <a href="/game?id=<?= htmlspecialchars($game['id']) ?>"
-                                       class="mb-4 inline-block px-3 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">
-                                        Ver Jogo
-                                    </a>
+                                    <div class="justify-center">
+                                        <a class="inline-flex items-center justify-center px-4 py-2 text-xs font-medium text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none min-w-[60px] min-h-[30px]"
+                                           href="/game?id=<?= htmlspecialchars($game['id']) ?>">Abrir</a>
+                                    </div>
                                 </td>
                             </tr>
                         <?php } ?>
@@ -254,19 +257,26 @@ extract($ranking);
                         <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Membro
+                                Nome
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Entrou
                             </th>
                         </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                         <?php foreach ($leagueMembers as $member) { ?>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap flex items-center">
-                                    <img class="h-8 w-8 rounded-full" src="<?= htmlspecialchars($member['avatar']) ?>"
-                                         alt="<?= htmlspecialchars($member['nome_utilizador']) ?>'s avatar">
-                                    <a href="/profile?id=<?= $member['id'] ?>"
-                                       class="ml-4 text-sm text-gray-500"><?= htmlspecialchars($member['nome_utilizador']) ?></a>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <img class="h-8 w-8 rounded-full" src="<?= htmlspecialchars($member['avatar']) ?>" alt="<?= htmlspecialchars($member['nome_utilizador']) ?>'s avatar">
+                                        <a href="/profile?id=<?= $member['id'] ?>" class="ml-4 text-sm text-gray-500"><?= htmlspecialchars($member['nome_utilizador']) ?></a>
+                                    </div>
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <?= htmlspecialchars((new DateTime($member['data_admissao']))->format("d/m/Y")) ?>
+                                </td>
+
                             </tr>
                         <?php } ?>
                         </tbody>
