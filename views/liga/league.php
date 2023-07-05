@@ -21,17 +21,15 @@ extract($ranking);
                 <h2 class="text-2xl font-bold mb-4">Informações</h2>
                 <div class="space-y-3">
                     <div class="flex items-center space-x-2">
-                        <p><span class="font-semibold">Gestor da Liga:</span> <img class="w-8 h-8 rounded-full"
-                                                                                   src="<?= $leagueDetails['avatar'] ?>"
-                                                                                   alt="Avatar do criador"><?= htmlspecialchars($leagueDetails['nome_utilizador']) ?>
+                        <p><img class="w-8 h-8 rounded-full"
+                                src="<?= $leagueDetails['avatar'] ?>"
+                                alt="Avatar do criador"><?= htmlspecialchars($leagueDetails['nome_utilizador']) ?>
                         </p>
                     </div>
                     <p>
-                        <span class="font-semibold">Criada em:</span> <?= htmlspecialchars((new DateTime($leagueDetails['data_criacao']))->format("d/m/Y")) ?>
-
+                        <?= htmlspecialchars((new DateTime($leagueDetails['data_criacao']))->format("d/m/Y")) ?>
                     </p>
-                    <p>
-                        <span class="font-semibold">Descrição:</span> <?= htmlspecialchars($leagueDetails['descricao']) ?>
+                    <p> <?= htmlspecialchars($leagueDetails['descricao']) ?>
                     </p>
                 </div>
             </div>
@@ -72,7 +70,7 @@ extract($ranking);
 
                                     <!--Score-->
                                     <div class="mx-2">
-                                        <span><?= $game['team1_score'] ?> - <?= $game['team2_score'] ?></span>
+                                        <span class="text-xl"><?= $game['team1_score'] ?> - <?= $game['team2_score'] ?></span>
                                     </div>
 
                                     <!--Team 2-->
@@ -106,6 +104,14 @@ extract($ranking);
                        class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">
                         Criar Jogo
                     </a>
+
+                    <?php if ($_SESSION['user']['id'] == $leagueDetails['id_criador']): ?>
+                        <a href="/game/create?league_id=<?php echo $_GET['id']; ?>"
+                           class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">
+                            Definições
+                        </a>
+                    <?php endif; ?>
+
                     <div class="mt-2">
                         <label for="invite-code" class="block text-sm font-medium text-gray-700">Código de
                             convite</label>
@@ -269,8 +275,11 @@ extract($ranking);
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <img class="h-8 w-8 rounded-full" src="<?= htmlspecialchars($member['avatar']) ?>" alt="<?= htmlspecialchars($member['nome_utilizador']) ?>'s avatar">
-                                        <a href="/profile?id=<?= $member['id'] ?>" class="ml-4 text-sm text-gray-500"><?= htmlspecialchars($member['nome_utilizador']) ?></a>
+                                        <img class="h-8 w-8 rounded-full"
+                                             src="<?= htmlspecialchars($member['avatar']) ?>"
+                                             alt="<?= htmlspecialchars($member['nome_utilizador']) ?>'s avatar">
+                                        <a href="/profile?id=<?= $member['id'] ?>"
+                                           class="ml-4 text-sm text-gray-500"><?= htmlspecialchars($member['nome_utilizador']) ?></a>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
