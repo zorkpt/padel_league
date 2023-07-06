@@ -193,6 +193,12 @@ GROUP BY Ligas.id;'
         $stmt->execute();
         $leagueInfo = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
+        // If no league was found, return false
+        if ($leagueInfo === false) {
+            return false;
+        }
+
         // Getting data for League creator
         $creatorData = UserController::getUserData($leagueInfo['id_criador']);
 
@@ -274,7 +280,6 @@ GROUP BY Ligas.id;'
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$result) {
-                // TODO: deal with error messages
                 SessionController::setFlashMessage('league_join_error', 'Código de convite inválido');
                 header('Location: /league/join');
                 exit();
@@ -299,6 +304,139 @@ GROUP BY Ligas.id;'
             header("Location: /league?id=$league_id");
         }
     }
+
+
+    public static function settings()
+    {
+        // Verify if user is logged in
+        if (!isLoggedIn()) {
+            SessionController::setFlashMessage('login', 'Tens de estar ligado para ver esta página');
+            header('Location: /login');
+            exit;
+        }
+
+        if (isset($_GET['id'])) {
+            $league_id = $_GET['id'];
+            $user_id = $_SESSION['user']['id'];
+
+            // Verify if user is a member of the league
+            if (!self::isUserMemberOfLeague($user_id, $league_id)) {
+                SessionController::setFlashMessage('access_error', 'Tu não és membro desta liga.');
+                header('Location: /error');
+                exit();
+            }
+
+            $leagueDetails = self::getLeagueInfo($league_id);
+
+            // Check if it is admin of the league
+            if ($user_id != $leagueDetails['id_criador']) {
+                SessionController::setFlashMessage('access_error', 'Não és administrador desta liga.');
+                header('Location: /error');
+            }
+
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $newLeagueName = $_POST['league-name'];
+                $newLeagueDescription = $_POST['description'];
+
+                if(empty($newLeagueDescription) || empty($newLeagueName)){
+                    SessionController::setFlashMessage('error', 'Não pode ficar vazio.');
+                    header('Location: ' . $_SERVER['REQUEST_URI']);
+                    exit;
+                }
+
+                $nameUpdateStatus = self::updateLeagueName($league_id, $newLeagueName);
+                $descriptionUpdateStatus = self::updateLeagueDescription($league_id, $newLeagueDescription);
+
+                if($nameUpdateStatus && $descriptionUpdateStatus){
+                    header('Location: /league?id=' . $league_id);
+                    exit();
+                } else {
+                    SessionController::setFlashMessage('error', 'Erro ao atualizar a informação da liga.');
+                }
+            }
+        }
+
+        require_once '../views/liga/settings.php';
+    }
+
+
+
+
+    public static function updateLeagueName($league_id, $newLeagueName)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare("UPDATE Ligas SET nome = :newName WHERE id = :league_id");
+        $stmt->bindParam(':newName', $newLeagueName, PDO::PARAM_STR);
+        $stmt->bindParam(':league_id', $league_id, PDO::PARAM_INT);
+
+        // Returns true if the update was successful, or false otherwise
+        return $stmt->execute();
+    }
+
+    public static function updateLeagueDescription($league_id, $newLeagueDescription)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare("UPDATE Ligas SET descricao = :newDescription WHERE id = :league_id");
+        $stmt->bindParam(':newDescription', $newLeagueDescription, PDO::PARAM_STR);
+        $stmt->bindParam(':league_id', $league_id, PDO::PARAM_INT);
+
+        // Returns true if the update was successful, or false otherwise
+        return $stmt->execute();
+    }
+
+
+    public static function confirmDelete() {
+        // Verify if user is logged in
+        if (!isLoggedIn()) {
+            SessionController::setFlashMessage('login', 'Tens de estar logado para aceder a esta página.');
+            header('Location: /login');
+            exit;
+        }
+        if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['id'])) {
+            $league_id = $_GET['id'];
+            $user_id = $_SESSION['user']['id'];
+
+            // Verify if user is the creator of the league
+            $leagueDetails = self::getLeagueInfo($league_id);
+            if ($user_id != $leagueDetails['id_criador']) {
+                SessionController::setFlashMessage('access_error', 'Não és administrador desta liga.');
+                header('Location: /error');
+                exit;
+            }
+            require_once '../views/liga/confirm_delete.php';
+        } elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $password = $_POST['password'];
+            $user_id = $_POST['user_id'];
+            $league_id = $_POST['league_id'];
+
+            if (UserController::verifyPassword($user_id, $password)) {
+                self::deleteLeague($league_id);
+                SessionController::setFlashMessage('success', 'A liga foi eliminada com sucesso.');
+                header('Location: /dashboard');
+                exit;
+            } else {
+                SessionController::setFlashMessage('error', 'A palavra-passe está errada.');
+                require_once '../views/liga/confirm_delete.php';
+            }
+        } else {
+            // If it's neither a GET nor a POST request, redirect to the error page
+            header('Location: /error');
+            exit;
+        }
+    }
+
+
+    public static function deleteLeague($league_id) {
+        $conn = dbConnect();
+
+        // Delete the league
+        $stmt = $conn->prepare('DELETE FROM Ligas WHERE id = :league_id');
+        $stmt->bindParam(':league_id', $league_id, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
+
 
 }
 

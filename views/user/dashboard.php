@@ -9,6 +9,11 @@ extract($leagues);
 
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+        <?php if ($validMessage = SessionController::getFlash('success')): ?>
+            <div class="text-green-500 mt-2 text-sm">
+                <?php echo $validMessage; ?>
+            </div>
+        <?php endif; ?>
         <table class="min-w-full divide-y shadow-md divide-gray-200">
             <thead class="bg-gray-50">
             <tr class="text-center">

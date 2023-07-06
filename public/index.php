@@ -1,5 +1,6 @@
 <?php
 require '../vendor/autoload.php';
+
 use Dotenv\Dotenv;
 
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));
@@ -15,7 +16,7 @@ require_once '../controllers/LeagueController.php';
 require_once '../controllers/GameController.php';
 require_once '../controllers/SessionController.php';
 require_once '../controllers/NotificationController.php';
-require_once  '../controllers/MailerController.php';
+require_once '../controllers/MailerController.php';
 
 
 $request_uri = explode('?', $_SERVER['REQUEST_URI'], 2);
@@ -133,7 +134,7 @@ switch ($request_uri[0]) {
         UserController::profile();
         break;
 
-        // Errors
+    // Errors
     case '/error';
         HomeController::error();
         break;
@@ -142,7 +143,13 @@ switch ($request_uri[0]) {
         NotificationController::handleReadNotification();
         break;
 
+    case '/league/settings';
+        LeagueController::settings();
+        break;
 
+    case '/league/confirm-delete';
+        LeagueController::confirmDelete();
+        break;
 
     default:
         header('HTTP/1.0 404 Not Found');
