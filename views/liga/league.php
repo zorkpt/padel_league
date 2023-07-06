@@ -34,6 +34,33 @@ extract($ranking);
                 </div>
             </div>
 
+
+            <!-- Create Game and Invite Code -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-1">
+                <h2 class="text-2xl font-bold mb-2">Gestão</h2>
+                <div class="overflow-y-auto max-h-[300px]">
+                    <a href="/game/create?league_id=<?php echo $_GET['id']; ?>"
+                       class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">
+                        Criar Jogo
+                    </a>
+
+                    <?php if ($_SESSION['user']['id'] == $leagueDetails['id_criador']): ?>
+                        <a href="/league/settings?id=<?php echo $_GET['id']; ?>"
+                           class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-orange-600 rounded shadow ripple hover:shadow-lg hover:bg-orange-800 focus:outline-none">
+                            Definições
+                        </a>
+                    <?php endif; ?>
+
+                    <div class="mt-2">
+                        <label for="invite-code" class="block text-sm font-medium text-gray-700">Código de
+                            convite</label>
+                        <input type="text" name="invite-code" id="invite-code"
+                               class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                               value="<?php echo $inviteCode['codigo_convite']; ?>" readonly>
+                    </div>
+                </div>
+            </div>
+
             <!-- Last 5 Matches -->
             <div class="h-300px md:col-span-2 bg-white p-4 rounded-lg shadow-md">
                 <h2 class="text-2xl font-bold mb-2">Ultimos Jogos Terminados</h2>
@@ -96,31 +123,7 @@ extract($ranking);
                 <?php endforeach; ?>
             </div>
 
-            <!-- Create Game and Invite Code -->
-            <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-1">
-                <h2 class="text-2xl font-bold mb-2">Gestão</h2>
-                <div class="overflow-y-auto max-h-[300px]">
-                    <a href="/game/create?league_id=<?php echo $_GET['id']; ?>"
-                       class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">
-                        Criar Jogo
-                    </a>
 
-                    <?php if ($_SESSION['user']['id'] == $leagueDetails['id_criador']): ?>
-                        <a href="/league/settings?id=<?php echo $_GET['id']; ?>"
-                           class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-orange-600 rounded shadow ripple hover:shadow-lg hover:bg-orange-800 focus:outline-none">
-                            Definições
-                        </a>
-                    <?php endif; ?>
-
-                    <div class="mt-2">
-                        <label for="invite-code" class="block text-sm font-medium text-gray-700">Código de
-                            convite</label>
-                        <input type="text" name="invite-code" id="invite-code"
-                               class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                               value="<?php echo $inviteCode['codigo_convite']; ?>" readonly>
-                    </div>
-                </div>
-            </div>
         </div>
 
 
