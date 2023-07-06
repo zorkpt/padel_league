@@ -7,7 +7,7 @@
                     <div class="flex-shrink-0">
                         <img class="h-8 w-8" src="<?= '/uploads/padel.png' ?>" alt="Liga-Padel">
                     </div>
-                    <div class="hidden md:block">
+                    <div>
                         <div class="ml-10 flex items-baseline space-x-4">
                             <?php
                             $notifications = NotificationController::getUnreadByUser($_SESSION['user']['id']);

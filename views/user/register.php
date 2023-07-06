@@ -4,7 +4,7 @@
 <?php require BASE_PATH . "/views/partials/banner.php"; ?>
 <?php SessionController::start(); ?>
 
-<main>
+<main class="flex-grow">
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
 
         <div class="w-full max-w-sm mx-auto p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">

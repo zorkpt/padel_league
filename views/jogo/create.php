@@ -3,7 +3,7 @@
 <?php $header = 'Adicionar Jogo'; ?>
 <?php require BASE_PATH . "/views/partials/banner.php"; ?>
 
-<main>
+<main class="flex-grow">
 
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
         <a href="/league?id=<?= $_GET['league_id'] ?>" class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">

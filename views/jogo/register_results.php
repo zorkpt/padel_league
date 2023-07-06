@@ -4,7 +4,7 @@
 <?php require BASE_PATH . "/views/partials/banner.php"; ?>
 <?php SessionController::start(); ?>
 
-<main>
+<main class="flex-grow">
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
         <form action="/game/submit_results?id=<?php echo $game['id']; ?>" method="post">
             <input type="hidden" name="game_id" value="<?= $game['id'] ?>">
