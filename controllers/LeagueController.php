@@ -269,9 +269,7 @@ GROUP BY Ligas.id;'
 
             $invite_code = $_POST['invite_code'];
 
-
             $conn = dbConnect();
-
 
             $stmt = $conn->prepare("SELECT id FROM Ligas WHERE codigo_convite = :invite_code");
             $stmt->bindParam(':invite_code', $invite_code);
@@ -288,6 +286,18 @@ GROUP BY Ligas.id;'
             $league_id = $result['id'];
             $user_id = $_SESSION['user']['id'];
 
+            // Check if user is already in the league
+            $stmt = $conn->prepare("SELECT 1 FROM Membros_Liga WHERE id_utilizador = :user_id AND id_liga = :league_id");
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->bindParam(':league_id', $league_id);
+            $stmt->execute();
+
+            if ($stmt->fetchColumn()) {
+                SessionController::setFlashMessage('league_join_error', 'Já estás inscrito nessa liga');
+                header('Location: /league/join');
+                exit();
+            }
+
             // adding user to the league
             $stmt = $conn->prepare("INSERT INTO Membros_Liga (id_utilizador, id_liga) VALUES (:user_id, :league_id)");
             $stmt->bindParam(':user_id', $user_id);
@@ -296,7 +306,7 @@ GROUP BY Ligas.id;'
 
             // adding user to league ranking with all 0
             $stmt = $conn->prepare("INSERT INTO Ranking (id_utilizador, id_liga, pontos, jogos_jogados, jogos_ganhos, jogos_perdidos) 
-                                VALUES (:user_id, :league_id, 0, 0, 0, 0)");
+                            VALUES (:user_id, :league_id, 0, 0, 0, 0)");
             $stmt->bindParam(':user_id', $user_id);
             $stmt->bindParam(':league_id', $league_id);
             $stmt->execute();
