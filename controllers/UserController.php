@@ -316,6 +316,23 @@ class UserController
         }
     }
 
+
+    public static function verifyPassword($user_id, $input_password) {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT password_hash FROM Utilizadores WHERE id = :user_id');
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user || !password_verify($input_password, $user['password_hash'])) {
+            return false;
+        }
+
+        return true;
+    }
+
+
     public static function dashboard()
     {
         if(!isLoggedIn()) {

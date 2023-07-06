@@ -128,7 +128,6 @@ class GameController
             // Render the game view
             require_once '../views/jogo/show.php';
         } else {
-            // If the game was not found or the user is not a member of the league, redirect to the error page
             // remember error messages
             header('Location: /error');
         }

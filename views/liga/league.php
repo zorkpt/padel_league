@@ -7,7 +7,7 @@ extract($lastFiveGames);
 extract($ranking);
 ?>
 <?php extract($openLeagueGames); ?>
-<?php $header = 'Liga ' . $leagueDetails['nome'] ?>
+<?php $header = $leagueDetails['nome'] ?>
 <?php require BASE_PATH . "/views/partials/banner.php"; ?>
 
 
@@ -106,8 +106,8 @@ extract($ranking);
                     </a>
 
                     <?php if ($_SESSION['user']['id'] == $leagueDetails['id_criador']): ?>
-                        <a href="/game/create?league_id=<?php echo $_GET['id']; ?>"
-                           class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">
+                        <a href="/league/settings?id=<?php echo $_GET['id']; ?>"
+                           class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-orange-600 rounded shadow ripple hover:shadow-lg hover:bg-orange-800 focus:outline-none">
                             Definições
                         </a>
                     <?php endif; ?>
