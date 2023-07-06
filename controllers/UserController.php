@@ -358,6 +358,11 @@ class UserController
 
     public static function profile()
     {
+        if (!isLoggedIn()) {
+            SessionController::setFlashMessage('login', 'Faz Login para ver esta página');
+            header('Location: /login');
+            exit;
+        }
         if($_SERVER['REQUEST_METHOD'] == 'GET'){
             $user_id = $_GET['id'];
 
@@ -382,13 +387,19 @@ class UserController
                 $win_loss_ratio = 0;
             }
 
-
             // leagues
             $leagues = LeagueController::getLeaguesUser($user_id);
+            foreach ($leagues as $key => $league) {
+                $player_ranking = LeagueController::getPlayerRankingInLeague($league['id'], $user_id);
+                $leagues[$key]['ranking'] = $player_ranking['rank'];
+                $leagues[$key]['points'] = $player_ranking['total_pontuacao'];
+            }
+
 
         }
         require_once BASE_PATH . '/views/user/profile.php';
     }
+
 
 
     public static function getUserData($user_id) {

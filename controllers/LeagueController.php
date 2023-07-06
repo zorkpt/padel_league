@@ -245,12 +245,46 @@ GROUP BY Ligas.id;'
     {
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT Ranking.id_utilizador, Utilizadores.nome_utilizador, Utilizadores.avatar, Ranking.pontos as total_pontuacao, Ranking.jogos_jogados, Ranking.jogos_ganhos as vitorias, Ranking.jogos_perdidos as derrotas, (Ranking.jogos_ganhos / Ranking.jogos_jogados * 100) as win_rate FROM Ranking
-    JOIN Utilizadores ON Ranking.id_utilizador = Utilizadores.id
-    WHERE Ranking.id_liga = :league_id 
-    ORDER BY total_pontuacao DESC');
+JOIN Utilizadores ON Ranking.id_utilizador = Utilizadores.id
+WHERE Ranking.id_liga = :league_id 
+ORDER BY total_pontuacao DESC');
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // adds a rank key based on position in array
+        foreach ($results as $key => $result) {
+            $results[$key]['rank'] = $key + 1;
+        }
+
+        return $results;
+    }
+
+    public static function getPlayerRankingInLeague($league_id, $user_id)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT Ranking.id_utilizador, Utilizadores.nome_utilizador, Utilizadores.avatar, Ranking.pontos as total_pontuacao, Ranking.jogos_jogados, Ranking.jogos_ganhos as vitorias, Ranking.jogos_perdidos as derrotas, (Ranking.jogos_ganhos / Ranking.jogos_jogados * 100) as win_rate FROM Ranking
+JOIN Utilizadores ON Ranking.id_utilizador = Utilizadores.id
+WHERE Ranking.id_liga = :league_id 
+ORDER BY total_pontuacao DESC');
+        $stmt->bindParam(':league_id', $league_id);
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // adds a rank key based on position in array
+        foreach ($results as $key => $result) {
+            $results[$key]['rank'] = $key + 1;
+        }
+
+        // return only the player specified
+        foreach ($results as $result) {
+            if ($result['id_utilizador'] == $user_id) {
+                return $result;
+            }
+        }
+
+        // return null if the player is not found
+        return null;
     }
 
 
@@ -349,7 +383,7 @@ GROUP BY Ligas.id;'
                 $newLeagueName = $_POST['league-name'];
                 $newLeagueDescription = $_POST['description'];
 
-                if(empty($newLeagueDescription) || empty($newLeagueName)){
+                if (empty($newLeagueDescription) || empty($newLeagueName)) {
                     SessionController::setFlashMessage('error', 'Não pode ficar vazio.');
                     header('Location: ' . $_SERVER['REQUEST_URI']);
                     exit;
@@ -358,7 +392,7 @@ GROUP BY Ligas.id;'
                 $nameUpdateStatus = self::updateLeagueName($league_id, $newLeagueName);
                 $descriptionUpdateStatus = self::updateLeagueDescription($league_id, $newLeagueDescription);
 
-                if($nameUpdateStatus && $descriptionUpdateStatus){
+                if ($nameUpdateStatus && $descriptionUpdateStatus) {
                     header('Location: /league?id=' . $league_id);
                     exit();
                 } else {
@@ -369,8 +403,6 @@ GROUP BY Ligas.id;'
 
         require_once '../views/liga/settings.php';
     }
-
-
 
 
     public static function updateLeagueName($league_id, $newLeagueName)
@@ -396,7 +428,8 @@ GROUP BY Ligas.id;'
     }
 
 
-    public static function confirmDelete() {
+    public static function confirmDelete()
+    {
         // Verify if user is logged in
         if (!isLoggedIn()) {
             SessionController::setFlashMessage('login', 'Tens de estar logado para aceder a esta página.');
@@ -437,7 +470,8 @@ GROUP BY Ligas.id;'
     }
 
 
-    public static function deleteLeague($league_id) {
+    public static function deleteLeague($league_id)
+    {
         $conn = dbConnect();
 
         // Delete the league
