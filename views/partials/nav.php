@@ -1,4 +1,4 @@
-<body class="h-full">
+<body class="flex flex-col min-h-screen h-full">
 <div class="min-h-full">
     <nav class="bg-gray-800">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -28,7 +28,7 @@
                     </div>
                 </div>
 
-                <div class="hidden md:block">
+                <div>
                     <div class="ml-4 flex items-center md:ml-6">
                         <div class="relative">
 

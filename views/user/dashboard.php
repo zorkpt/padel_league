@@ -7,7 +7,7 @@
 extract($leagues);
 ?>
 
-<main>
+<main class="flex-grow">
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
         <?php if ($validMessage = SessionController::getFlash('success')): ?>
             <div class="text-green-500 mt-2 text-sm">
@@ -38,12 +38,12 @@ extract($leagues);
         </table>
         <div class="mt-6 flex items-center justify-end gap-x-6">
             <a href="/leagues/create"
-               class="unsubscribe-button rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600">
+               class="mx-auto unsubscribe-button rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600">
                 Criar nova Liga</a>
         </div>
     </div>
 
-</main
+</main>
 
 
 <?php require BASE_PATH . "/views/partials/footer.php"; ?>
