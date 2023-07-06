@@ -8,62 +8,50 @@
 
 <main>
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-        <div class="container mx-auto my-10 p-6 md:px-12">
-
-            <div class="w-full md:w-1/2 lg:w-1/3 flex flex-col items-center mx-auto">
-
+        <div class="w-full max-w-sm mx-auto p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex flex-col items-center">
                 <!-- Avatar -->
-
-                <div class="w-32 h-32 mb-4 rounded-full bg-gray-400"><img alt="avatar" class="rounded" src="<?= $_SESSION['user']['avatar']; ?>"> </div>
-
-                <!-- Nome do utilizador -->
-<!--                --><?php //dd($user_name); ?>
-                <h2 class="text-2xl font-semibold mb-2 mt-4"><?php echo $user_name['nome_utilizador']; ?></h2>
-
-                <!-- W/L Ratio -->
-                <div class="text-gray-600 mb-10">
-                    <span>Jogos: <?= $score['jogos_jogados'];  ?> </span>
-                    <span>Vitorias: <?= $score['jogos_ganhos']; ?></span>
-                    <span>Win Rate: <?php echo $win_loss_ratio; ?></span>
+                <div class="w-32 h-32 mb-4 rounded-full bg-gray-400">
+                    <img alt="avatar" class="object-cover w-full h-full rounded-sm" src="<?= $_SESSION['user']['avatar']; ?>">
                 </div>
-
+                <!-- Nome do utilizador -->
+                <h2 class="text-2xl font-semibold mb-2 mt-4"><?= $user_name['nome_utilizador']; ?></h2>
+                <!-- W/L Ratio -->
+                <div class="text-gray-600 mb-10 space-y-1">
+                    <div>Jogos: <?= $score['jogos_jogados'];  ?> </div>
+                    <div>Vitorias: <?= $score['jogos_ganhos']; ?></div>
+                    <div>Win Rate: <?= $win_loss_ratio; ?></div>
+                </div>
                 <!-- Botão de Enviar Mensagem -->
-                <button class="mb-4 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                <button class="mb-4 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300">
                     Enviar Mensagem
                 </button>
-
                 <!-- Ligas -->
                 <h3 class="text-lg font-semibold mb-2">Ligas</h3>
-<!---->
-
-                <table class="table-auto">
-                    <thead>
+                <table class="w-full table-auto">
+                    <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-2">Liga</th>
-                        <th class="px-4 py-2">Descrição</th>
-
-                        <th class="px-4 py-2">Membros</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Liga</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Membros</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bg-white divide-y divide-gray-200">
                     <?php foreach ($leagues as $league) : ?>
                         <tr>
-                            <td class="border px-4 py-2"><a class="text-blue-500 hover:underline"
-                                                            href="league?id=<?= $league['id'] ?>"><?= htmlspecialchars($league['nome']) ?></a>
+                            <td class="px-4 py-2">
+                                <a class="text-indigo-600 hover:underline" href="league?id=<?= $league['id'] ?>"><?= htmlspecialchars($league['nome']) ?></a>
                             </td>
-                            <td class="border px-4 py-2"><?= htmlspecialchars($league['descricao']) ?></td>
-
-                            <td class="border px-4 py-2"><?= htmlspecialchars($league['membros_ativos']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($league['descricao']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($league['membros_ativos']) ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>
                 </table>
-
-
             </div>
-
         </div>
     </div>
+
 </main>
 
 <?php require  BASE_PATH . "/views/partials/footer.php"; ?>

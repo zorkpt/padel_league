@@ -20,6 +20,11 @@ class GameController
 
     public static function addGame()
     {
+        if(!isLoggedIn()) {
+            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
+            header('Location: /login');
+            exit;
+        }
         // Check if the form is submitted
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['league_id'])) {
             $user_id = $_SESSION['user']['id'];
@@ -84,8 +89,7 @@ class GameController
             $league_id = $_GET['league_id'];
             require_once "../views/jogo/create.php";
         } else {
-            // If the form is not submitted or the league_id is not set, redirect to the error page
-            // need to deal with error messages later ... remember
+            SessionController::setFlashMessage('error','Link Inválido.');
             header('Location: /error');
         }
     }

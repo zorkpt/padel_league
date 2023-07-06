@@ -147,7 +147,7 @@ extract($ranking);
                                         <img class="w-8 h-8 rounded-full mr-2" src="<?= $row['avatar'] ?>"
                                              alt="<?= $row['nome_utilizador'] ?>'s avatar">
                                         <a class="text-blue-500 underline hover:text-blue-600"
-                                        /profile?id=<?= $row['id_utilizador'] ?>"><?= $row['nome_utilizador'] ?></a>
+                                           href="/profile?id=<?= $row['id_utilizador'] ?>"><?= $row['nome_utilizador'] ?></a>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['jogos_jogados'] ?></td>
@@ -201,7 +201,9 @@ extract($ranking);
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-center">
                                         <a class="inline-flex items-center justify-center px-4 py-2 text-xs font-medium text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none min-w-[60px] min-h-[30px]"
-                                           href="/game?id=<?= htmlspecialchars($game['id']) ?>">Abrir</a>
+                                           href="/game?id=<?= htmlspecialchars($game['id']) ?>">
+                                           Ver
+                                        </a>
                                     </div>
                                 </td>
 
@@ -275,10 +277,11 @@ extract($ranking);
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <img class="h-8 w-8 rounded-full"
+                                        <img class="h-8 w-8 rounded-full mr-2"
                                              src="<?= htmlspecialchars($member['avatar']) ?>"
                                              alt="<?= htmlspecialchars($member['nome_utilizador']) ?>'s avatar">
-                                        <a href="/profile?id=<?= $member['id'] ?>"
+                                        <a class="text-blue-500 underline hover:text-blue-600"
+                                           href="/profile?id=<?= $member['id'] ?>"
                                            class="ml-4 text-sm text-gray-500"><?= htmlspecialchars($member['nome_utilizador']) ?></a>
                                     </div>
                                 </td>
