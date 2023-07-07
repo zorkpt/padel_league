@@ -14,17 +14,25 @@
                             ?>
                             <?php if (isLoggedIn()): ?>
                                 <a href="/dashboard"
-                                   class="<?= uriIs('/dashboard') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">Dashboard</a>
+                                   class="<?= uriIs('/dashboard') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">
+                                    <span class="flex items-center">Dashboard</span>
+                                </a>
                                 <a href="/league/join"
-                                   class="<?= uriIs('/league') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">Juntar
-                                    a Liga</a>
+                                   class="<?= uriIs('/league') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">
+                                    <span class="flex items-center">Juntar a Liga</span>
+                                </a>
                             <?php else: ?>
                                 <a href="/register"
-                                   class="<?= uriIs('/register') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">Registrar</a>
+                                   class="<?= uriIs('/register') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">
+                                    <span class="flex items-center">Registrar</span>
+                                </a>
                                 <a href="/login"
-                                   class="<?= uriIs('/login') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">Login</a>
+                                   class="<?= uriIs('/login') ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page"' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' ?>">
+                                    <span class="flex items-center">Login</span>
+                                </a>
                             <?php endif ?>
                         </div>
+
                     </div>
                 </div>
 

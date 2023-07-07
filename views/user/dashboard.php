@@ -19,8 +19,8 @@ extract($leagues);
             <tr class="text-center">
                 <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Nome da Liga</th>
                 <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Criação</th>
-                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Membros Ativos</th>
+                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  md:table-cell hidden">Data de Criação</th>
+                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  md:table-cell hidden">Membros Ativos</th>
             </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -30,8 +30,8 @@ extract($leagues);
                                                           href="league?id=<?= $league['id'] ?>"><?= htmlspecialchars($league['nome']) ?>
                     </td>
                     <td class="px-6 py-4 items-center"><?= htmlspecialchars($league['descricao']) ?></td>
-                    <td class="px-6 py-4 items-center"><?= htmlspecialchars((new DateTime($league['data_criacao']))->format("d/m/Y")) ?></td>
-                    <td class="px-6 py-4 items-center"><?= htmlspecialchars($league['membros_ativos']) ?></td>
+                    <td class="px-6 py-4 items-center  md:table-cell hidden"><?= htmlspecialchars((new DateTime($league['data_criacao']))->format("d/m/Y")) ?></td>
+                    <td class="px-6 py-4 items-center  md:table-cell hidden"><?= htmlspecialchars($league['membros_ativos']) ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
