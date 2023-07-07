@@ -16,7 +16,6 @@ extract($ranking);
 
         <div class="mx-auto h-300px max-w-7xl py-6 sm:px-6 lg:px-8">
 
-
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <!--League Info-->
                 <div class="bg-white shadow-md rounded-lg p-6">
@@ -60,6 +59,31 @@ extract($ranking);
                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                    value="<?php echo $inviteCode['codigo_convite']; ?>" readonly>
                         </div>
+
+                        <div class="mt-2">
+                            <form method="post">
+                                <label for="email" class="block text-sm font-medium text-gray-700">Convidar por
+                                    E-Mail</label>
+                                <input type="text" name="email" id="email"
+                                       class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                <button type="submit"
+                                        class="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
+                                    Enviar Convite
+                                </button>
+                            </form>
+                        </div>
+                        <?php if ($email_errors = SessionController::getFlash('error')): ?>
+                            <div class="text-red-500 mt-2 text-sm">
+                                <?= $email_errors ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($email_success = SessionController::getFlash('success')): ?>
+                            <div class="text-green-500 mt-2 text-sm">
+                                <?= $email_success ?>
+                            </div>
+                        <?php endif; ?>
+
+
                     </div>
                 </div>
 
@@ -306,7 +330,7 @@ extract($ranking);
     </main>
 
 
-<?php require BASE_PATH . "/views/partials/footer.php"; ?>
+    <?php require BASE_PATH . "/views/partials/footer.php"; ?>
 
 
 

@@ -4,6 +4,18 @@ class UserController
 {
     public static function register()
     {
+        if(isLoggedIn()) {
+            header('Location: /dashboard');
+            exit;
+        }
+
+        $emailFromInvite = self::getEmailFromInvite();
+
+        if ($emailFromInvite) {
+            $_SESSION['old']['email'] = $emailFromInvite;
+        }
+
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $username = $_POST['username'];
             $email = $_POST['email'];
@@ -48,8 +60,7 @@ class UserController
                     SessionController::setFlashMessage('avatar', $error);
                 }
             }
-
-            // Verify is there are errors and insert user on db
+            // Verify there are no errors and insert user on db
             if (!SessionController::hasFlash('username') && !SessionController::hasFlash('email') && !SessionController::hasFlash('password') && !SessionController::hasFlash('avatar')) {
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
@@ -63,11 +74,28 @@ class UserController
                 $stmt->bindParam(':data_registo', $created_date);
 
                 $stmt->execute();
+                $newUserId = $conn->lastInsertId();  // Get the ID of the newly created user
+
+                // Log the user in
+                $_SESSION['user'] = [
+                    'id' => $newUserId,
+                    'nome_utilizador' => $username,
+                    'email' => $email,
+                    'avatar' => $avatarDestination,
+                ];
 
                 $mailer = new MailerController();
                 $mailer->sendWelcomeEmail($email, $username);
 
-                header('Location: /login');
+                // Check if there's an invitation code in the session
+                if (isset($_SESSION['invite_code'])) {
+                    // There's an invitation code. Redirect to the accept invitation page
+                    header('Location: /accept-invite?code=' . $_SESSION['invite_code']);
+                    exit();
+                } else {
+                    header('Location: /dashboard');
+                    exit;
+                }
             }
         }
 
@@ -176,8 +204,15 @@ class UserController
     public static function login()
     {
         if(isLoggedIn()) {
-            header('Location: /dashboard');
-            exit;
+            // Check if there's an invite code in the session or GET params
+            if (isset($_GET['invite_code'])) {
+                // There's an invitation code. Redirect to the accept invitation page
+                header('Location: /accept-invite?codigo=' . $_GET['invite_code']);
+                exit();
+            } else {
+                header('Location: /dashboard');
+                exit;
+            }
         }
 
         $errors = [];
@@ -197,14 +232,20 @@ class UserController
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             unset($user['password']);
 
-
             if ($user && password_verify($password, $user['password_hash'])) {
-
                 session_start();
                 $_SESSION['user'] = $user;
 
-                header('Location: /dashboard');
-                exit;
+                // Check if there's an invite code in the session or GET params
+                if (isset($_GET['invite_code'])) {
+                    // There's an invitation code. Redirect to the accept invitation page
+                    header('Location: /accept-invite?codigo=' . $_GET['invite_code']);
+                    exit();
+                } else {
+                    header('Location: /dashboard');
+                    exit;
+                }
+
             } else {
                 $errors['login'] = 'Nome de usuário ou senha incorretos.';
                 $_SESSION['errors'] = $errors;
@@ -213,6 +254,7 @@ class UserController
 
         require_once '../views/user/login.php';
     }
+
 
     public static function changePassword()
     {
@@ -277,12 +319,10 @@ class UserController
             $existingEmail = $stmt->fetch();
 
             if ($existingEmail) {
-
                 SessionController::setFlashMessage('email', 'Este e-mail já está em uso.');
                 header('Location: /settings');
                 exit();
             }
-
 
             $stmt = $conn->prepare('UPDATE Utilizadores SET email = :email where id = :id');
             $stmt->bindParam(':id', $_SESSION['user']['id']);
@@ -325,15 +365,9 @@ class UserController
 
     public static function settings()
     {
-        if (!isLoggedIn()) {
-            SessionController::setFlashMessage('login', 'Faz Login para ver esta página');
-            header('Location: /login');
-            exit;
-        }
+        checkLoggedIn();
         require_once BASE_PATH . '/views/user/settings.php';
     }
-
-
 
     public static function profile()
     {
@@ -487,6 +521,29 @@ class UserController
             SessionController::setFlashMessage('error', 'Endereço Inválido');
             header('Location /error');
             exit();
+        }
+    }
+
+    public static function getEmailFromInvite() {
+        if (!isset($_SESSION['invite_code'])) {
+            return null;
+        }
+
+        $inviteCode = $_SESSION['invite_code'];
+
+        $conn = dbConnect();
+        $stmt = $conn->prepare("SELECT email FROM Convites_Pendentes WHERE codigo_convite = :invite_code");
+        $stmt->bindParam(':invite_code', $inviteCode);
+        $stmt->execute();
+
+        $invite = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($invite) {
+            // Return the email from the invite
+            return $invite['email'];
+        } else {
+            // No invite found
+            return null;
         }
     }
 

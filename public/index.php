@@ -151,6 +151,10 @@ switch ($request_uri[0]) {
         LeagueController::confirmDelete();
         break;
 
+    case '/accept-invite';
+        LeagueController::acceptInvitation();
+        break;
+
     default:
         header('HTTP/1.0 404 Not Found');
         require '../views/404.php';

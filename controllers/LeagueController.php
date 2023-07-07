@@ -104,31 +104,62 @@ GROUP BY Ligas.id;'
     {
         checkLoggedIn();
 
-        if (isset($_GET['id'])) {
-            $league_id = $_GET['id'];
-            $user_id = $_SESSION['user']['id'];
-            // Verify if user is a member of the league
-            if (!self::isUserMemberOfLeague($user_id, $league_id)) {
-                SessionController::setFlashMessage('access_error', 'Tu não és membro desta liga.');
-                header('Location: /error');
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            if (isset($_POST['email']) && filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+                $league_id = $_GET['id'];
+                $user_id = $_SESSION['user']['id'];
+                // Ensure the user is a member of the league
+                if (!self::isUserMemberOfLeague($user_id, $league_id)) {
+                    SessionController::setFlashMessage('access_error', 'Tu não és membro desta liga.');
+                    header('Location: /error');
+                    exit();
+                }
+
+                $invite_email = $_POST['email'];
+                $leagueDetails = self::getLeagueInfo($league_id);
+
+                $invitationSent = self::inviteToLeague($league_id, $leagueDetails['nome'], $invite_email);
+
+                if($invitationSent){
+                    SessionController::setFlashMessage('success', 'Convite enviado com sucesso para ' . $invite_email);
+                } else {
+                    SessionController::setFlashMessage('error', 'Ocorreu um erro ao enviar o convite. Por favor tente novamente.');
+                }
+
+                header("Location: /league?id=$league_id");
+                exit();
+            } else {
+                SessionController::setFlashMessage('error', 'Por favor insira um e-mail válido.');
+                header('Location: ' . $_SERVER['REQUEST_URI']);
                 exit();
             }
+        } else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+            if (isset($_GET['id'])) {
+                $league_id = $_GET['id'];
+                $user_id = $_SESSION['user']['id'];
+                // Verify if user is a member of the league
+                if (!self::isUserMemberOfLeague($user_id, $league_id)) {
+                    SessionController::setFlashMessage('access_error', 'Tu não és membro desta liga.');
+                    header('Location: /error');
+                    exit();
+                }
 
-            // Get all league data
-            $leagueDetails = self::getLeagueInfo($league_id);
-            $leagueGames = self::getLeagueGames($league_id);
-            $leagueMembers = self::getLeagueMembers($league_id);
-            $openLeagueGames = self::getLeagueGames($league_id, GAME_STATUS_OPEN);
-            $ongoingLeagueGames = self::getLeagueGames($league_id, GAME_STATUS_ONGOING);
-            $inviteCode = self::getInviteCode($league_id);
-            $lastFiveGames = self::lastGames($league_id, 5);
-            $ranking = self::getPlayerRankings($league_id);
+                // Get all league data
+                $leagueDetails = self::getLeagueInfo($league_id);
+                $leagueGames = self::getLeagueGames($league_id);
+                $leagueMembers = self::getLeagueMembers($league_id);
+                $openLeagueGames = self::getLeagueGames($league_id, GAME_STATUS_OPEN);
+                $ongoingLeagueGames = self::getLeagueGames($league_id, GAME_STATUS_ONGOING);
+                $inviteCode = self::getInviteCode($league_id);
+                $lastFiveGames = self::lastGames($league_id, 5);
+                $ranking = self::getPlayerRankings($league_id);
 
-            require_once '../views/liga/league.php';
-
-        } else {
-            SessionController::setFlashMessage('error', 'Endereço Inválido');
-            header('Location: /error');
+                require_once '../views/liga/league.php';
+            } else {
+                SessionController::setFlashMessage('error', 'Endereço Inválido');
+                header('Location: /error');
+            }
         }
     }
 
@@ -517,6 +548,99 @@ ORDER BY total_pontuacao DESC');
             exit;
         }
     }
+
+    public static function inviteToLeague($leagueId, $leagueName, $email) {
+        $conn = dbConnect();
+
+        // Generate a unique invitation code
+        $invitationCode = bin2hex(random_bytes(16));
+
+        // Insert into pending invites table
+        $stmt = $conn->prepare("INSERT INTO Convites_Pendentes (id_liga, email, codigo_convite) VALUES (:league_id, :email, :invitation_code)");
+        $stmt->bindParam(':league_id', $leagueId);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':invitation_code', $invitationCode);
+        $stmt->execute();
+
+        // Send the invitation email
+        $mailer = new MailerController();
+        $invitationLink = "https://liga-padel.pt/accept-invite?code=" . $invitationCode;
+        return $mailer->sendLeagueInvitationEmail($email, $leagueName, $invitationLink);
+    }
+
+
+
+    public static function acceptInvitation()
+    {
+        // Check if the invitation code is provided
+        if (!isset($_GET['code'])) {
+            SessionController::setFlashMessage('error', 'Código de convite inválido.');
+            header('Location: /error');
+            exit();
+        }
+
+        $inviteCode = $_GET['code'];
+
+        // Check if the user is logged in
+        if (!isset($_SESSION['user'])) {
+            // User is not logged in. Store the invite code in the session and redirect to the login page
+            $_SESSION['invite_code'] = $inviteCode;
+            header('Location: /login');
+            exit();
+        }
+
+        // User is logged in. Process the invitation
+        $userId = $_SESSION['user']['id'];
+
+        if (self::processInvitation($userId, $inviteCode)) {
+            // If the invitation is processed successfully, remove the invite code from the session
+            unset($_SESSION['invite_code']);
+            SessionController::setFlashMessage('success', 'Convite aceite com sucesso!');
+            header('Location: /dashboard');
+        } else {
+            SessionController::setFlashMessage('error', 'Falha ao aceitar o convite.');
+            header('Location: /error');
+        }
+    }
+
+    public static function processInvitation($userId, $inviteCode) {
+        $conn = dbConnect();
+
+        // Get the invitation data
+        $stmt = $conn->prepare("SELECT * FROM Convites_Pendentes WHERE codigo_convite = :invite_code");
+        $stmt->bindParam(':invite_code', $inviteCode);
+        $stmt->execute();
+
+        $invite = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$invite) {
+            // The invite code is not valid
+            return false;
+        }
+
+        // Check if the invite is for this user
+        if ($invite['email'] != $_SESSION['user']['email']) {
+            // The invite is not for this user
+            return false;
+        }
+
+        // The invite is valid and for this user. Add the user to the league
+        $stmt = $conn->prepare("INSERT INTO Membros_Liga (id_liga, id_utilizador) VALUES (:league_id, :user_id)");
+        $stmt->bindParam(':league_id', $invite['id_liga']);
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->execute();
+
+        // Delete the invite
+        $stmt = $conn->prepare("DELETE FROM Convites_Pendentes WHERE codigo_convite = :invite_code");
+        $stmt->bindParam(':invite_code', $inviteCode);
+        $stmt->execute();
+
+        return true;
+    }
+
+
+
+
+
 }
 
 

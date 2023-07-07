@@ -92,5 +92,19 @@ class MailerController {
         $body .= "<p>Se não solicitaste uma redefinição de senha, por favor ignora este e-mail.</p>";
         return $body;
     }
+    public function sendLeagueInvitationEmail($to, $leagueName, $invitationLink) {
+        $subject = "Convite para {$leagueName} - Liga-Padel";
+        $body = $this->generateLeagueInvitationEmailBody($leagueName, $invitationLink);
+        return $this->sendEmail($to, $subject, $body);
+    }
+
+    private function generateLeagueInvitationEmailBody($leagueName, $invitationLink) {
+        $body = "<h1>Convite</h1>";
+        $body .= "<p>Foste convidado para se juntar à liga " . htmlspecialchars($leagueName) . " na Liga-Padel.</p>";
+        $body .= "<p>Clica no link abaixo para aceitares o convite:</p>";
+        $body .= "<a href='" . htmlspecialchars($invitationLink) . "'>Aceitar Convite</a>";
+        $body .= "<p>Se não esperavas este convite, por favor ignora este e-mail.</p>";
+        return $body;
+    }
 
 }
