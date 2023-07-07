@@ -6,7 +6,7 @@
 <main class="flex-grow">
 
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-        <div class="w-full max-w-sm mx-auto p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+        <div class="w-full max-w-sm mx-auto p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8">
             <form method="POST" class="space-y-6" action="/league/join">
                 <div>
                     <label for="invite_code" class="block text-sm font-medium leading-6 text-gray-900">Código
