@@ -31,9 +31,12 @@
 
                     ?>
                 </p>
-
-
             </div>
+            <?php if ($errorMessage = SessionController::getFlash('error')): ?>
+                <div class="text-red-500 mt-2 text-sm">
+                    <?php echo $errorMessage; ?>
+                </div>
+            <?php endif; ?>
 
         </div>
 

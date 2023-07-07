@@ -101,15 +101,9 @@ class UserController
 
     public static function updateAvatar()
     {
-        // verify if user is logged in
-        if(!isLoggedIn()) {
-            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
-            header('Location: /login');
-            exit;
-        }
+        checkLoggedIn();
 
         try {
-            // Handle the uploaded avatar
             list($avatarPath, $errors) = self::handleAvatarUpload($_FILES['avatar']);
 
             if (!empty($errors)) {
@@ -134,7 +128,6 @@ class UserController
             SessionController::setFlashMessage('avatar', $e->getMessage());
         }
 
-        // Redirect back to the profile page
         header('Location: /settings');
         exit;
     }
@@ -153,7 +146,6 @@ class UserController
                 $avatarName = $avatar['name'];
                 $avatarTmpName = $avatar['tmp_name'];
                 $avatarSize = $avatar['size'];
-                $avatarType = $avatar['type'];
 
                 $avatarExt = explode('.', $avatarName);
                 $avatarActualExt = strtolower(end($avatarExt));
@@ -177,13 +169,12 @@ class UserController
             }
         }
 
-        // Retorne o local do avatar e os erros
+        // avatar path and errors
         return [$avatarDestination, $errors];
     }
 
     public static function login()
     {
-
         if(isLoggedIn()) {
             header('Location: /dashboard');
             exit;
@@ -225,14 +216,8 @@ class UserController
 
     public static function changePassword()
     {
-        // verify if user is logged in
-        if(!isLoggedIn()) {
-            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
-            header('Location: /login');
-            exit;
-        }
+        checkLoggedIn();
 
-        $errors = [];
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $old_password = $_POST['old_password'];
             $new_password = $_POST['new_password'];
@@ -273,12 +258,8 @@ class UserController
 
     public static function changeEmail()
     {
-        // verify if user is logged in
-        if(!isLoggedIn()) {
-            SessionController::setFlashMessage('login','Tens de estar ligado para ver esta página');
-            header('Location: /login');
-            exit;
-        }
+
+        checkLoggedIn();
 
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $newMail = $_POST['email'];
@@ -335,10 +316,8 @@ class UserController
 
     public static function dashboard()
     {
-        if(!isLoggedIn()) {
-            header('Location: /login');
-            exit;
-        }
+        checkLoggedIn();
+
         $user_id = $_SESSION['user']['id'];
         $leagues = LeagueController::getLeaguesUser($user_id);
         require_once '../views/user/dashboard.php';
@@ -358,17 +337,14 @@ class UserController
 
     public static function profile()
     {
-        if (!isLoggedIn()) {
-            SessionController::setFlashMessage('login', 'Faz Login para ver esta página');
-            header('Location: /login');
-            exit;
-        }
+        checkLoggedIn();
+
         if($_SERVER['REQUEST_METHOD'] == 'GET'){
             $user_id = $_GET['id'];
 
             // username query
             $conn = dbConnect();
-            $stmt = $conn->prepare('SELECT nome_utilizador from Utilizadores where id = :id');
+            $stmt = $conn->prepare('SELECT nome_utilizador, avatar from Utilizadores where id = :id');
             $stmt->bindParam(':id', $user_id);
             $stmt->execute();
 

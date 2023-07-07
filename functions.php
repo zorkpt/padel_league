@@ -24,3 +24,11 @@ function uriIs($value) {
 function isLoggedIn() {
     return isset($_SESSION['user']['id']);
 }
+
+function checkLoggedIn() {
+    if (!isLoggedIn()) {
+        SessionController::setFlashMessage('login', 'Tens de estar ligado para ver esta página');
+        header('Location: /login');
+        exit;
+    }
+}

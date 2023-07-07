@@ -11,7 +11,7 @@
                 <!-- Avatar -->
                 <div class="w-32 h-32 mb-4 rounded-full bg-gray-400">
                     <img alt="avatar" class="object-cover w-full h-full rounded-sm"
-                         src="<?= $_SESSION['user']['avatar']; ?>">
+                         src="<?= $user_name['avatar']; ?>">
                 </div>
                 <!-- Nome do utilizador -->
                 <h2 class="text-2xl font-semibold mb-2 mt-4"><?= $user_name['nome_utilizador']; ?></h2>

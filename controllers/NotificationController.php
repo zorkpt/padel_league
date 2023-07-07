@@ -11,7 +11,7 @@ class NotificationController {
     }
 
     public static function getUnreadByUser($user_id) {
-        // Here we assume that a notification is "unread" if its "read_at" column is NULL
+        // "unread" if "read_at" column is NULL
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT * FROM notifications WHERE user_id = :user_id AND read_at IS NULL ORDER BY created_at DESC');
         $stmt->bindParam(':user_id', $user_id);
