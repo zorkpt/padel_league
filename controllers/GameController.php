@@ -357,7 +357,7 @@ class GameController
         $team2_score = $result['team2_score'];
 
         // check if the results are null or zero
-        return (!is_null($team1_score) && $team1_score != 0) && (!is_null($team2_score) && $team2_score != 0);
+        return (!is_null($team1_score) && $team1_score != 0) || (!is_null($team2_score) && $team2_score != 0);
     }
 
     public static function finishGame()
