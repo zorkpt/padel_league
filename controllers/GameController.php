@@ -27,7 +27,7 @@ class GameController
             $local = $_POST['local'];
             $data_hora = $_POST['data_hora'];
 
-            $game_id = self::addGameToDatabase($league_id, $local, $data_hora);
+            $game_id = self::addGameToDatabase($league_id, $local, $data_hora, $user_id);
             self::addPlayerToGame($game_id, $user_id);
             self::notifyUsersNewGame($game_id, $user_id, $league_id);
 
@@ -43,13 +43,14 @@ class GameController
         }
     }
 
-    public static function addGameToDatabase($league_id, $local, $data_hora)
+    public static function addGameToDatabase($league_id, $local, $data_hora, $user_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('INSERT INTO Jogos (id_liga, local, data_hora, status) VALUES (:league_id, :local, :data_hora, 1)');
+        $stmt = $conn->prepare('INSERT INTO Jogos (id_liga, local, data_hora, status, criador) VALUES (:league_id, :local, :data_hora, 1, :creator_id)');
         $stmt->bindParam(':league_id', $league_id);
         $stmt->bindParam(':local', $local);
         $stmt->bindParam(':data_hora', $data_hora);
+        $stmt->bindParam(':creator_id', $user_id);
         $stmt->execute();
         return $conn->lastInsertId();  // return the game ID
     }
@@ -123,7 +124,7 @@ class GameController
     public static function getGameData($game_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT id, id_liga, local, data_hora, status, team1_score, team2_score FROM Jogos WHERE id = :game_id');
+        $stmt = $conn->prepare('SELECT id, id_liga, local, data_hora, status, team1_score, team2_score, criador FROM Jogos WHERE id = :game_id');
         $stmt->bindParam(':game_id', $game_id);
         $stmt->execute();
 
@@ -288,6 +289,63 @@ class GameController
 
         return true;
     }
+
+    public static function startChangeTeams()
+    {
+        checkLoggedIn();
+        $game_id = $_GET['id'];
+        $_SESSION['adjustTeams'] = $game_id;
+        header("Location: /game?id=$game_id");
+    }
+
+    public static function submitChangeTeams()
+    {
+        $game_id = $_POST['game_id'];
+
+        $new_teams = $_POST['team'];
+
+        $result = self::changeTeams($game_id, $new_teams);
+        if ($result === true) {
+            unset($_SESSION['adjustTeams']);
+            SessionController::setFlashMessage('success', 'Equipas Alteradas');
+            header("Location: /game?id=$game_id");
+        } else {
+            SessionController::setFlashMessage('error','Algo correu mal, tenta de novo.');
+            header('Location /error');
+        }
+    }
+
+
+    public static function changeTeams($game_id, $new_teams)
+    {
+        $conn = dbConnect();
+        $conn->beginTransaction();
+
+
+        $stmt = $conn->prepare('SELECT * FROM Jogos WHERE id = :game_id AND status = :status');
+        $stmt->bindParam(':game_id', $game_id);
+        $stmt->bindValue(':status', GAME_LOCKED);
+        $stmt->execute();
+        $game = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$game) {
+            return 'O jogo não existe ou não está trancado.';
+        }
+
+        // Atualize as equipes dos jogadores
+        foreach ($new_teams as $user_id => $team) {
+            $stmt = $conn->prepare('UPDATE Jogadores_Jogo SET equipa = :team WHERE id_utilizador = :user_id AND id_jogo = :game_id');
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->bindParam(':team', $team);
+            $stmt->bindParam(':game_id', $game_id);
+            $stmt->execute();
+        }
+
+        $conn->commit();
+
+        return true;
+    }
+
 
     public static function getSubscribedPlayers($game_id)
     {

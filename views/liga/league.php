@@ -150,7 +150,6 @@ extract($ranking);
                 </div>
             </div>
 
-
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
                 <!--Ranking-->
                 <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-2">
