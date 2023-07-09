@@ -124,7 +124,7 @@ class GameController
     public static function getGameData($game_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT id, id_liga, local, data_hora, status, team1_score, team2_score, criador FROM Jogos WHERE id = :game_id');
+        $stmt = $conn->prepare('SELECT id, id_liga, local, data_hora, status, team1_score, team2_score, criador, fim_jogo FROM Jogos WHERE id = :game_id');
         $stmt->bindParam(':game_id', $game_id);
         $stmt->execute();
 
@@ -310,7 +310,7 @@ class GameController
             SessionController::setFlashMessage('success', 'Equipas Alteradas');
             header("Location: /game?id=$game_id");
         } else {
-            SessionController::setFlashMessage('error','Algo correu mal, tenta de novo.');
+            SessionController::setFlashMessage('error', 'Algo correu mal, tenta de novo.');
             header('Location /error');
         }
     }
@@ -379,17 +379,33 @@ class GameController
     public static function submitResults()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $gameId = $_GET['id'];
-
+            $game_id = $_GET['id'];
+            $game = self::getGame($game_id);
             $team1_score = $_POST['team1_score'];
             $team2_score = $_POST['team2_score'];
 
-            self::updateResults($gameId, $team1_score, $team2_score);
+            if($team1_score == $team2_score) {
+                SessionController::setFlashMessage('error', 'Não é permitido empates.');
+                include(BASE_PATH . 'views/jogo/register_results.php');
+                exit();
+            }
 
-            header("Location: /game?id=$gameId");
+            self::updateSetScore($game_id, $team1_score, $team2_score);  // call updateSetScore instead of updateResults
+            $game = self::getGame($game_id); // update $game after updating the scores
+
+            if ($game['team1_score'] < 2 && $game['team2_score'] < 2) {
+                // The game hasn't ended, so render the result submission form again
+                include(BASE_PATH . 'views/jogo/register_results.php');
+            } else {
+                self::setGameFinished($game_id);  // New function to set game_finished to 1
+                // Then redirect to the game page
+                header('Location: /game?id=' . $game_id);
+            }
             exit();
         }
     }
+
+
 
     public static function updateResults($gameId, $team1_score, $team2_score)
     {
@@ -482,6 +498,62 @@ class GameController
             $stmt->bindParam(':game_id', $game_id);
             $stmt->execute();
         }
+    }
+
+    public static function getSets($game_id)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT * FROM Sets WHERE game_id = :game_id ORDER BY sequence_number ASC');
+        $stmt->bindParam(':game_id', $game_id);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    public static function updateSetScore($game_id, $team1_score, $team2_score)
+    {
+        $conn = dbConnect();
+        $conn->beginTransaction();
+
+        // Determine the sequence number for this set
+        $stmt = $conn->prepare('SELECT MAX(sequence_number) as max_sequence_number FROM Sets WHERE game_id = :game_id');
+        $stmt->bindParam(':game_id', $game_id);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $sequence_number = $result['max_sequence_number'] + 1;
+
+        // Insert the set into the database
+        $stmt = $conn->prepare('INSERT INTO Sets (game_id, sequence_number, team1_score, team2_score) VALUES (:game_id, :sequence_number, :team1_score, :team2_score)');
+        $stmt->bindParam(':game_id', $game_id);
+        $stmt->bindParam(':sequence_number', $sequence_number);
+        $stmt->bindParam(':team1_score', $team1_score);
+        $stmt->bindParam(':team2_score', $team2_score);
+        $stmt->execute();
+
+        // Determine the winner of the set
+        $set_winner = ($team1_score > $team2_score) ? 1 : 2;
+
+        // Update the game score in the database
+        $stmt = $conn->prepare('UPDATE Jogos SET team' . $set_winner . '_score = team' . $set_winner . '_score + 1 WHERE id = :game_id');
+        $stmt->bindParam(':game_id', $game_id);
+        $stmt->execute();
+
+        $conn->commit();
+
+        // If a team has won 2 sets, call updateScores
+        $game = self::getGame($game_id);
+        if ($game['team1_score'] == 2 || $game['team2_score'] == 2) {
+            self::updateScores($game_id, $set_winner, true);
+
+        }
+    }
+
+    public static function setGameFinished($game_id)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare("UPDATE Jogos SET fim_jogo = 1 WHERE id = ?");
+        return $stmt->execute([$game_id]);
     }
 
 

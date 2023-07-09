@@ -88,7 +88,7 @@ extract($ranking);
                 </div>
 
                 <!-- Last 5 Matches -->
-                <div class="h-300px md:col-span-2 bg-white p-4 rounded-lg shadow-md">
+                <div class="h-[300px] md:col-span-2 bg-white p-4 rounded-lg shadow-md overflow-y-auto">
                     <h2 class="text-2xl font-bold mb-2">Ultimos Jogos Terminados</h2>
 
                     <?php foreach ($lastFiveGames as $game): ?>
