@@ -27,7 +27,7 @@ class GameController
             $local = $_POST['local'];
             $data_hora = $_POST['data_hora'];
 
-            $game_id = self::addGameToDatabase($league_id, $local, $data_hora);
+            $game_id = self::addGameToDatabase($league_id, $local, $data_hora, $user_id);
             self::addPlayerToGame($game_id, $user_id);
             self::notifyUsersNewGame($game_id, $user_id, $league_id);
 
@@ -43,13 +43,14 @@ class GameController
         }
     }
 
-    public static function addGameToDatabase($league_id, $local, $data_hora)
+    public static function addGameToDatabase($league_id, $local, $data_hora, $user_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('INSERT INTO Jogos (id_liga, local, data_hora, status) VALUES (:league_id, :local, :data_hora, 1)');
+        $stmt = $conn->prepare('INSERT INTO Jogos (id_liga, local, data_hora, status, criador) VALUES (:league_id, :local, :data_hora, 1, :creator_id)');
         $stmt->bindParam(':league_id', $league_id);
         $stmt->bindParam(':local', $local);
         $stmt->bindParam(':data_hora', $data_hora);
+        $stmt->bindParam(':creator_id', $user_id);
         $stmt->execute();
         return $conn->lastInsertId();  // return the game ID
     }
@@ -123,7 +124,7 @@ class GameController
     public static function getGameData($game_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT id, id_liga, local, data_hora, status, team1_score, team2_score FROM Jogos WHERE id = :game_id');
+        $stmt = $conn->prepare('SELECT id, id_liga, local, data_hora, status, team1_score, team2_score, criador FROM Jogos WHERE id = :game_id');
         $stmt->bindParam(':game_id', $game_id);
         $stmt->execute();
 
@@ -292,7 +293,6 @@ class GameController
     public static function startChangeTeams()
     {
         checkLoggedIn();
-
         $game_id = $_GET['id'];
         $_SESSION['adjustTeams'] = $game_id;
         header("Location: /game?id=$game_id");
@@ -302,7 +302,7 @@ class GameController
     {
         $game_id = $_POST['game_id'];
 
-        $new_teams = $_POST['team']; 
+        $new_teams = $_POST['team'];
 
         $result = self::changeTeams($game_id, $new_teams);
         if ($result === true) {

@@ -6,7 +6,8 @@
 <?php extract($players); ?>
 <?php extract($playerIds); ?>
 <?php $currentUserId = $_SESSION['user']['id']; ?>
-
+<?php $creatorID = $game['criador'] ?>
+<?php $creatorName = UserController::getUserData($creatorID)['nome_utilizador']; ?>
 
 
 <div class="mb-auto">
@@ -35,6 +36,7 @@
 
                             ?>
                         </p>
+                        <p class="mt-2 text-sm text-gray-500">Criador do jogo: <?= $creatorName ?></p>
                     </div>
                     <?php if ($errors = SessionController::getFlash('error')): ?>
                         <div class="text-red-500 mt-2 text-sm">
@@ -147,19 +149,20 @@
                             <?php endif; ?>
                         <?php endif; ?>
 
+                        <?php if (!isset($_SESSION['adjustTeams']) && $currentUserId == $creatorID && $game['status'] == GAME_LOCKED && !$resultsExist): ?>
+                            <a href="/game/change_teams?id=<?php echo $game['id']; ?>" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Alterar Equipas</a>
+                        <?php endif; ?>
 
-                        <?php if (!isset($_SESSION['adjustTeams'])): ?>
+
+
                         <?php if ($game['status'] == GAME_LOCKED && !$resultsExist): ?>
-                            <a href="/game/change_teams?id=<?php echo $game['id']; ?>"
-                               class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Alterar
-                                Equipas</a>
                             <a href="/game/register_results?id=<?php echo $game['id']; ?>"
                                class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Registrar
                                 Resultados</a>
                         <?php else: ?>
                             <div class="cursor-not-allowed opacity-50">Registrar Resultados</div>
                         <?php endif; ?>
-                        <?php endif; ?>
+
 
                         <?php if ($game['status'] == GAME_LOCKED && $resultsExist): ?>
                             <form action="/game/finish" method="POST">
@@ -178,7 +181,7 @@
                 <!-- start change teams-->
                 <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-2 space-y-4"> <!-- adicionar space-y-4 -->
                     <div class="overflow-y-auto max-h-[400px]"> <!-- aumentar a altura máxima para 400px -->
-                        <?php if (isset($_SESSION['adjustTeams'])): ?>
+                        <?php if (isset($_SESSION['adjustTeams']) && $currentUserId === $creatorID): ?>
                             <?php if ($game['status'] == GAME_LOCKED && !$resultsExist): ?>
                                 <form action="/game/change_teams" method="POST">
                                     <input type="hidden" name="game_id" value="<?php echo $game['id']; ?>">
