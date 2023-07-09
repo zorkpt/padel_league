@@ -353,13 +353,23 @@ class UserController
         return true;
     }
 
+    public  static function getDaysFromLastGame($user_id){
+        $lastGameDate = GameController::getLastUserGameDate($user_id);
+        $lastGameDateTime = new DateTime($lastGameDate);
+        $currentDateTime = new DateTime();
+        $interval = $currentDateTime->diff($lastGameDateTime);
+        return $interval->format('%a');
+    }
 
     public static function dashboard()
     {
         checkLoggedIn();
-
         $user_id = $_SESSION['user']['id'];
         $leagues = LeagueController::getLeaguesUser($user_id);
+        $user = self::getUserData($user_id);
+        $daysSinceLastGame =  self::getDaysFromLastGame($user_id);
+        $lastGames = GameController::getPlayerGames($user_id);
+
         require_once '../views/user/dashboard.php';
     }
 

@@ -345,6 +345,37 @@ class GameController
 
         return true;
     }
+    public static function getLastUserGameDate($user_id){
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT MAX(Jogos.data_hora) as last_game_date 
+                            FROM Jogos 
+                            INNER JOIN Jogadores_Jogo ON Jogos.id = Jogadores_Jogo.id_jogo 
+                            WHERE Jogadores_Jogo.id_utilizador = :user_id AND Jogos.fim_jogo = 1');
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['last_game_date'];
+    }
+
+    public static function getPlayerGames($user_id) {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT Jogos.id, Jogos.local, Jogos.data_hora, Jogos.team1_score, Jogos.team2_score, Jogos.fim_jogo,
+                            Jogadores_Jogo.equipa, Jogadores_Jogo.pontuacao, 
+                            CASE 
+                                WHEN Jogadores_Jogo.equipa = 1 AND Jogos.team1_score > Jogos.team2_score THEN "Vitória"
+                                WHEN Jogadores_Jogo.equipa = 2 AND Jogos.team1_score < Jogos.team2_score THEN "Vitória"
+                                ELSE "Derrota"
+                            END as Resultado
+                            FROM Jogos 
+                            INNER JOIN Jogadores_Jogo ON Jogos.id = Jogadores_Jogo.id_jogo 
+                            WHERE Jogadores_Jogo.id_utilizador = :user_id AND Jogos.fim_jogo = 1 
+                            ORDER BY Jogos.data_hora DESC');
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
 
 
     public static function getSubscribedPlayers($game_id)
