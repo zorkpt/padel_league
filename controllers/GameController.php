@@ -289,6 +289,64 @@ class GameController
         return true;
     }
 
+    public static function startChangeTeams()
+    {
+        checkLoggedIn();
+
+        $game_id = $_GET['id'];
+        $_SESSION['adjustTeams'] = $game_id;
+        header("Location: /game?id=$game_id");
+    }
+
+    public static function submitChangeTeams()
+    {
+        $game_id = $_POST['game_id'];
+
+        $new_teams = $_POST['team']; 
+
+        $result = self::changeTeams($game_id, $new_teams);
+        if ($result === true) {
+            unset($_SESSION['adjustTeams']);
+            SessionController::setFlashMessage('success', 'Equipas Alteradas');
+            header("Location: /game?id=$game_id");
+        } else {
+            SessionController::setFlashMessage('error','Algo correu mal, tenta de novo.');
+            header('Location /error');
+        }
+    }
+
+
+    public static function changeTeams($game_id, $new_teams)
+    {
+        $conn = dbConnect();
+        $conn->beginTransaction();
+
+
+        $stmt = $conn->prepare('SELECT * FROM Jogos WHERE id = :game_id AND status = :status');
+        $stmt->bindParam(':game_id', $game_id);
+        $stmt->bindValue(':status', GAME_LOCKED);
+        $stmt->execute();
+        $game = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$game) {
+            return 'O jogo não existe ou não está trancado.';
+        }
+
+        // Atualize as equipes dos jogadores
+        foreach ($new_teams as $user_id => $team) {
+            $stmt = $conn->prepare('UPDATE Jogadores_Jogo SET equipa = :team WHERE id_utilizador = :user_id AND id_jogo = :game_id');
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->bindParam(':team', $team);
+            $stmt->bindParam(':game_id', $game_id);
+            $stmt->execute();
+        }
+
+        $conn->commit();
+
+        return true;
+    }
+
+
     public static function getSubscribedPlayers($game_id)
     {
         $conn = dbConnect();

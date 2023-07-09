@@ -14,6 +14,7 @@ extract($leagues);
                 <?php echo $validMessage; ?>
             </div>
         <?php endif; ?>
+        <h1 class="block mb-2 text-sm font-medium text-gray-900">As minhas ligas</h1>
         <table class="min-w-full divide-y shadow-md divide-gray-200">
             <thead class="bg-gray-50">
             <tr class="text-center">

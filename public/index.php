@@ -155,6 +155,14 @@ switch ($request_uri[0]) {
         LeagueController::acceptInvitation();
         break;
 
+    case '/game/change_teams':
+        if($_SERVER['REQUEST_METHOD'] == 'GET') {
+            GameController::startChangeTeams();
+        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            GameController::submitChangeTeams();
+        }
+        break;
+
     default:
         header('HTTP/1.0 404 Not Found');
         require '../views/404.php';
