@@ -25,7 +25,7 @@ class LeagueController
 
             // insert league creator as member of the league
             self::addMemberToLeague($creator_id, $league_id, 1); // 1 for admin
-
+            self::addUserToRanking($creator_id,$league_id);
             header('Location: /dashboard');
         }
         require_once '../views/liga/league_create.php';
