@@ -350,12 +350,18 @@ class GameController
     public static function getSubscribedPlayers($game_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT Jogadores_Jogo.id_utilizador, Ranking.pontos FROM Jogadores_Jogo
-                            LEFT JOIN Ranking ON Jogadores_Jogo.id_utilizador = Ranking.id_utilizador
-                            WHERE Jogadores_Jogo.id_jogo = :game_id
-                            ORDER BY Ranking.pontos DESC');
+        $stmt = $conn->prepare('
+    SELECT Jogadores_Jogo.id_utilizador, Ranking.pontos 
+    FROM Jogadores_Jogo
+    LEFT JOIN Ranking 
+    ON Jogadores_Jogo.id_utilizador = Ranking.id_utilizador
+    AND Ranking.id_liga = (SELECT id_liga FROM Jogos WHERE id = :game_id) 
+    WHERE Jogadores_Jogo.id_jogo = :game_id
+    ORDER BY Ranking.pontos DESC
+');
         $stmt->bindParam(':game_id', $game_id);
         $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
