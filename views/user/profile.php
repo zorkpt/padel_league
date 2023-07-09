@@ -6,6 +6,10 @@
 <main class="flex-grow">
 
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+        <a href="<?= $_SERVER['HTTP_REFERER'] ?>"
+           class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none">
+            Voltar
+        </a>
         <div class="w-full max-w-sm mx-auto p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8">
             <div class="flex flex-col items-center">
                 <!-- Avatar -->
