@@ -82,8 +82,6 @@ extract($ranking);
                                 <?= $email_success ?>
                             </div>
                         <?php endif; ?>
-
-
                     </div>
                 </div>
 
@@ -191,7 +189,7 @@ extract($ranking);
                         </table>
                     </div>
                 </div>
-
+            </div>
                 <!-- open games -->
                 <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-2">
                     <h2 class="text-2xl font-bold mb-2">Jogos Abertos</h2>
