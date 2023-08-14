@@ -14,7 +14,7 @@ extract($ranking);
 
     <main>
 
-        <div class="mx-auto h-300px max-w-7xl py-6 sm:px-6 lg:px-8">
+        <div class="space-y-4 mx-auto h-300px max-w-7xl py-6 sm:px-6 lg:px-8">
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <!--League Info-->
@@ -107,7 +107,7 @@ extract($ranking);
                                         ?>
 
                                         <!--Team 1-->
-                                        <div class="w-1/3 p-2 bg-white rounded shadow">
+                                        <div class="w-2/5 p-2 bg-white rounded shadow">
                                             <?php foreach ($team1 as $player): ?>
                                                 <div class="flex items-center">
                                                     <img class="h-8 w-8 rounded-full mr-2"
@@ -125,7 +125,7 @@ extract($ranking);
                                         </div>
 
                                         <!--Team 2-->
-                                        <div class="w-1/3 p-2 bg-white rounded shadow">
+                                        <div class="w-2/5 p-2 bg-white rounded shadow">
                                             <?php foreach ($team2 as $player): ?>
                                                 <div class="flex items-center">
                                                     <img class="h-8 w-8 rounded-full mr-2"
@@ -190,144 +190,141 @@ extract($ranking);
                     </div>
                 </div>
             </div>
-                <!-- open games -->
-                <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-2">
-                    <h2 class="text-2xl font-bold mb-2">Jogos Abertos</h2>
-                    <div class="overflow-y-auto max-h-[300px]">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Data
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Hora
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Local
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Inscritos
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Ações
-                                </th>
+
+            <!-- open games -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 grid-cols-1 md:grid-cols-4 gap-4 md:col-span-2">
+                <h2 class="text-2xl font-bold mb-2">Jogos Abertos</h2>
+                <div class="overflow-y-auto max-h-[300px]">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Data
+                            </th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Hora
+                            </th>
+                            <th class="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Local
+                            </th>
+                            <th class="hidden md:block px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Inscritos
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Ações
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        <?php foreach ($openLeagueGames as $game) { ?>
+                            <tr class="text-center">
+                                <!-- Encurtando a exibição da data para "dd/mm" -->
+                                <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("d/m")) ?></td>
+                                <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("H:i")) ?></td>
+                                <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-500 truncate whitespace-normal break-words w-[150px]"><?= htmlspecialchars($game['local']) ?></td>
+                                <td class="hidden md:block px-2 py-4 whitespace-nowrap text-sm text-gray-500"><?= count(GameController::getPlayersInGame($game['id'])) ?>/4</td>
+                                <td class="px-4 py-2">
+                                    <div class="flex items-center justify-center">
+                                        <!-- Redução no tamanho do botão -->
+                                        <a class="inline-flex items-center justify-center px-3 py-1 text-xs font-medium text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none"
+                                           href="/game?id=<?= htmlspecialchars($game['id']) ?>">
+                                            Ver
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                            <?php foreach ($openLeagueGames as $game) { ?>
-                                <tr class="text-center">
-                                    <td class="px-6 py-4 items-center"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("d/m/Y")) ?></td>
-                                    <td class="px-6 py-4 items-center"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("H:i")) ?></td>
-                                    <td class="px-6 py-4 items-center"><?= htmlspecialchars($game['local']) ?></td>
-                                    <td class="px-6 py-4 items-center">
-                                        <?= count(GameController::getPlayersInGame($game['id'])) ?>/4
-                                    </td>
-
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center justify-center">
-                                            <a class="inline-flex items-center justify-center px-4 py-2 text-xs font-medium text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none min-w-[60px] min-h-[30px]"
-                                               href="/game?id=<?= htmlspecialchars($game['id']) ?>">
-                                                Ver
-                                            </a>
-                                        </div>
-                                    </td>
-
-
-                                </tr>
-                            <?php } ?>
-                            </tbody>
-                        </table>
-                    </div>
+                        <?php } ?>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
-
-                <!-- ongoing games -->
-                <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-2">
-                    <h2 class="text-2xl font-bold mb-2">Jogos a Decorrer</h2>
-                    <div class="overflow-y-auto max-h-[300px]">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+            <!-- ongoing games -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 grid-cols-1 md:grid-cols-4 gap-4 md:col-span-2">
+                <h2 class="text-2xl font-bold mb-2">Jogos a Decorrer</h2>
+                <div class="overflow-y-auto max-h-[300px]">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Data
+                            </th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Hora
+                            </th>
+                            <th class="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Local
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Ações
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        <?php foreach ($ongoingLeagueGames as $game) { ?>
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Data
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Hora
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Local
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Ações
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                            <?php foreach ($ongoingLeagueGames as $game) { ?>
-                                <tr>
-                                    <td class="px-6 py-4 items-center"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("d/m/Y")) ?></td>
-                                    <td class="px-6 py-4 items-center"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("H:i")) ?></td>
-                                    <td class="px-6 py-4 items-center"><?= htmlspecialchars($game['local']) ?></td>
+                                <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("d/m")) ?></td>
+                                <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars((new DateTime($game['data_hora']))->format("H:i")) ?></td>
+                                <td class="px-6 py-4 items-center"><?= htmlspecialchars($game['local']) ?></td>
 
-                                    <td class="px-6 py-4 items-center">
-                                        <div class="justify-center">
-                                            <a class="inline-flex items-center justify-center px-4 py-2 text-xs font-medium text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none min-w-[60px] min-h-[30px]"
-                                               href="/game?id=<?= htmlspecialchars($game['id']) ?>">Abrir</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                <td class="px-6 py-4 items-center">
+                                    <div class="justify-center">
+                                        <a class="inline-flex items-center justify-center px-4 py-2 text-xs font-medium text-white uppercase transition bg-indigo-600 rounded shadow ripple hover:shadow-lg hover:bg-indigo-800 focus:outline-none min-w-[60px] min-h-[30px]"
+                                           href="/game?id=<?= htmlspecialchars($game['id']) ?>">Abrir</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
-                <!--Members List-->
-                <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-2">
-                    <h2 class="text-2xl font-bold mb-2">Membros</h2>
-                    <div class="overflow-y-auto max-h-[300px]">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+            <!--Members List-->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 grid-cols-1 md:grid-cols-4 gap-4 md:col-span-2">
+                <h2 class="text-2xl font-bold mb-2">Membros</h2>
+                <div class="overflow-y-auto max-h-[300px]">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Nome
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Entrou
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        <?php foreach ($leagueMembers as $member) { ?>
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Nome
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Entrou
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                            <?php foreach ($leagueMembers as $member) { ?>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <img class="h-8 w-8 rounded-full mr-2"
-                                                 src="<?= htmlspecialchars($member['avatar']) ?>"
-                                                 alt="<?= htmlspecialchars($member['nome_utilizador']) ?>'s avatar">
-                                            <a class="text-blue-500 underline hover:text-blue-600"
-                                               href="/profile?id=<?= $member['id'] ?>"
-                                               class="ml-4 text-sm text-gray-500"><?= htmlspecialchars($member['nome_utilizador']) ?></a>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <?= htmlspecialchars((new DateTime($member['data_admissao']))->format("d/m/Y")) ?>
-                                    </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <img class="h-8 w-8 rounded-full mr-2"
+                                             src="<?= htmlspecialchars($member['avatar']) ?>"
+                                             alt="<?= htmlspecialchars($member['nome_utilizador']) ?>'s avatar">
+                                        <a class="text-blue-500 underline hover:text-blue-600"
+                                           href="/profile?id=<?= $member['id'] ?>"
+                                           class="ml-4 text-sm text-gray-500"><?= htmlspecialchars($member['nome_utilizador']) ?></a>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <?= htmlspecialchars((new DateTime($member['data_admissao']))->format("d/m/Y")) ?>
+                                </td>
 
-                                </tr>
-                            <?php } ?>
-                            </tbody>
-                        </table>
-                    </div>
+                            </tr>
+                        <?php } ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
+
     </main>
 
 
-    <?php require BASE_PATH . "/views/partials/footer.php"; ?>
+<?php require BASE_PATH . "/views/partials/footer.php"; ?>
 
 
 

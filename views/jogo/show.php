@@ -56,10 +56,12 @@
                 <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-2">
 
                     <?php if ($game['status'] == GAME_LOCKED || $game['status'] == GAME_FINISHED): ?>
-                        <div class="flex justify-center items-center">
+                        <!-- Flex container -->
+                        <div class="flex flex-col md:flex-row justify-center items-center">
                             <!-- Team 1 -->
                             <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ml-2 flex flex-col">
-                                <h2 class="mb-4 text-xl font-bold text-center text-gray-700">EQUIPA 1:</h2>
+
+                            <h2 class="mb-4 text-xl font-bold text-center text-gray-700">EQUIPA 1:</h2>
                                 <ul class="mb-4 text-gray-700 text-center">
                                     <?php foreach ($players as $player): ?>
                                         <?php if ($player['equipa'] == 1): ?>
@@ -72,11 +74,9 @@
                                     <?php endforeach; ?>
                                 </ul>
                             </div>
-
                             <!-- Score -->
-
                             <div class="mx-4 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
-                                <h2 class="mb-1 text-xl font-bold text-center text-gray-700">Score:</h2>
+                            <h2 class="mb-1 text-xl font-bold text-center text-gray-700">Score:</h2>
                                 <div class="text-center mb-1 text-gray-700"><?= $game['team1_score'] ?>
                                     - <?= $game['team2_score'] ?></div>
                                 <div class="text-center text-gray-700">
@@ -120,7 +120,7 @@
 
                             <!-- Team 2 -->
                             <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
-                                <h2 class="mb-4 mr-3 text-xl font-bold text-center text-gray-700">EQUIPA 2:</h2>
+                            <h2 class="mb-4 mr-3 text-xl font-bold text-center text-gray-700">EQUIPA 2:</h2>
                                 <ul class="mb-4 text-gray-700 text-center">
                                     <?php foreach ($players as $player): ?>
                                         <?php if ($player['equipa'] == 2): ?>
