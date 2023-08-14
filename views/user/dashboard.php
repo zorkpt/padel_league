@@ -7,10 +7,10 @@ extract($lastGames);
 ?>
 <header class="bg-white shadow">
     <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col md:flex-row justify-between items-center">
             <h1 class="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
 
-            <div class="flex items-center gap-x-6">
+            <div class="flex items-center gap-x-6 mt-4 md:mt-0">
                 <a href="/leagues/create"
                    class="unsubscribe-button rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600">
                     Criar nova Liga</a>
@@ -24,14 +24,14 @@ extract($lastGames);
 </header>
 
 <main class="flex-grow">
-    <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 grid grid-cols-4 gap-4">
+    <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="col-span-4">
             <?php if ($validMessage = SessionController::getFlash('success')): ?>
                 <div class="text-green-500 mt-2 text-sm">
                     <?php echo $validMessage; ?>
                 </div>
             <?php endif; ?>
-            <h1 class="block mb-2 text-sm font-medium text-gray-900">As minhas ligas</h1>
+            <h1 class="pl-5 block mb-2 text-sm font-medium text-gray-900">As minhas ligas</h1>
             <table class="min-w-full divide-y shadow-md divide-gray-200">
                 <thead class="bg-gray-50">
                 <tr class="text-center">
@@ -60,12 +60,14 @@ extract($lastGames);
             </table>
         </div>
 
-        <div class="bg-white shadow-md rounded-lg p-6 md:col-span-2">
+        <!-- Ligas Proximas de ti -->
+        <div class="bg-white shadow-md rounded-lg p-6 col-span-4 md:col-span-2">
             <h2 class="mb-4 text-lg font-bold">Ligas Proximas de ti</h2>
         </div>
 
-        <div class="bg-white shadow-md rounded-lg p-6 md:col-span-1 text-center">
-            <p class="mb-4 text-lg font-bold">O teu último jogo foi há:</p>
+        <!-- O teu último jogo foi há -->
+        <div class="bg-white shadow-md rounded-lg p-6 col-span-4 md:col-span-1 text-center">
+        <p class="mb-4 text-lg font-bold">O teu último jogo foi há:</p>
             <div class="text-4xl font-bold text-blue-600 my-2"><?= $daysSinceLastGame ?></div>
             <?php if ($daysSinceLastGame == 1): ?>
                 <p class="text-gray-500">dia</p>
@@ -74,8 +76,9 @@ extract($lastGames);
             <?php endif; ?>
         </div>
 
-        <div class="bg-white shadow-md rounded-lg p-6 md:col-span-1 h-[300px] overflow-y-auto">
-            <h2 class="mb-4 text-lg font-bold">Últimos jogos:</h2>
+        <!-- Últimos jogos -->
+        <div class="bg-white shadow-md rounded-lg p-6 col-span-4 md:col-span-1 overflow-y-auto">
+        <h2 class="mb-4 text-lg font-bold">Últimos jogos:</h2>
             <?php foreach ($lastGames as $game): ?>
                 <a href="game?id=<?= $game['id'] ?>" class="block mb-4">
                     <div class="p-4 rounded-lg shadow-sm border border-gray-200">
