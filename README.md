@@ -38,11 +38,6 @@ The objective of the Padel League Management Platform is to create a web-based s
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
-### Installation
-
-#### Traditional Setup
-Detailed instructions on how to set up your traditional PHP environment and install the platform will be provided soon.
-
 #### Docker Setup
 1. **Clone the Repository**
    ```bash
