@@ -356,7 +356,7 @@ class UserController
     public  static function getDaysFromLastGame($user_id){
         $lastGameDate = GameController::getLastUserGameDate($user_id);
         if(!$lastGameDate){
-            return 0;
+            return -1;
         }
         $lastGameDateTime = new DateTime($lastGameDate);
         $currentDateTime = new DateTime();

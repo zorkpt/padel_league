@@ -70,10 +70,10 @@ extract($lastGames);
         <!-- O teu último jogo foi há -->
         <div class="bg-white shadow-md rounded-lg p-6 col-span-4 md:col-span-1 text-center">
         <p class="mb-4 text-lg font-bold">O teu último jogo foi há:</p>
-            <div class="text-4xl font-bold text-blue-600 my-2"><?= $daysSinceLastGame ?></div>
+            <div class="text-4xl font-bold text-blue-600 my-2"><?php if($daysSinceLastGame==-1){echo "Sem jogos.";} else echo $daysSinceLastGame ?></div>
             <?php if ($daysSinceLastGame == 1): ?>
                 <p class="text-gray-500">dia</p>
-            <?php else: ?>
+            <?php elseif($daysSinceLastGame > 1): ?>
                 <p class="text-gray-500">dias</p>
             <?php endif; ?>
         </div>
