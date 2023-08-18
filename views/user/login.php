@@ -1,6 +1,6 @@
 <?php require BASE_PATH . "/views/partials/head.php"; ?>
 <?php require BASE_PATH . "/views/partials/nav.php"; ?>
-<?php session_start(); ?>
+<?php SessionController::start(); ?>
 <?php $header = 'Login'; ?>
 <?php require BASE_PATH . "/views/partials/banner.php"; ?>
 
@@ -12,7 +12,7 @@
                 <div>
                     <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Nome de
                         Utilizador</label>
-                    <input name="username" id="username" value="<?php echo $_SESSION['old']['username'] ?>"
+                    <input name="username" id="username" value="<?php if(isset($_SESSION['old']['username'])) echo $_SESSION['old']['username'] ?>"
                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                            placeholder="nomedeutilizador" required>
                 </div>

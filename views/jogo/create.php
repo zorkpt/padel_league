@@ -15,7 +15,7 @@
                 <div>
                     <input type="hidden" name="league_id" value="<?php echo htmlspecialchars($league_id); ?>">
                     <label for="local" class="block mb-2 text-sm font-medium text-gray-900">Local</label>
-                    <input name="local" id="local" value="<?php echo $_SESSION['old']['local'] ?>"
+                    <input name="local" id="local" value="<?php if(isset($_SESSION['old']['local'])) echo $_SESSION['old']['local'] ?>"
                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                            placeholder="cidade" required="">
                 </div>
@@ -28,7 +28,7 @@
                 <div>
                     <label for="data_hora"
                            class="block mb-2 text-sm font-medium text-gray-900">Data/Hora</label>
-                    <input type="datetime-local" name="data_hora" id="data_hora" value="<?php echo $_SESSION['old']['data_hora'] ?>"
+                    <input type="datetime-local" name="data_hora" id="data_hora" value="<?php if(isset($_SESSION['old']['data_hora'])) echo $_SESSION['old']['data_hora'] ?>"
                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                            placeholder="nome@site.com" required="">
                 </div>

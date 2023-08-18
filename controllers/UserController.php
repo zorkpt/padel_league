@@ -233,7 +233,7 @@ class UserController
             unset($user['password']);
 
             if ($user && password_verify($password, $user['password_hash'])) {
-                session_start();
+                SessionController::start();
                 $_SESSION['user'] = $user;
 
                 // Check if there's an invite code in the session or GET params
@@ -401,18 +401,26 @@ class UserController
 
             $score = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if($score['jogos_jogados'] > 0) {
-                $win_loss_ratio = ($score['jogos_ganhos'] / $score['jogos_jogados']) * 100;
-            }else{
+            if ($score !== false && isset($score['jogos_jogados']) && isset($score['jogos_ganhos'])) {
+                if ($score['jogos_jogados'] > 0) {
+                    $win_loss_ratio = ($score['jogos_ganhos'] / $score['jogos_jogados']) * 100;
+                }
+            } else {
+                $score = [];
+                $score['jogos_ganhos'] = 0;
+                $score['jogos_jogados'] = 0;
                 $win_loss_ratio = 0;
             }
+
 
             // leagues
             $leagues = LeagueController::getLeaguesUser($user_id);
             foreach ($leagues as $key => $league) {
                 $player_ranking = LeagueController::getPlayerRankingInLeague($league['id'], $user_id);
-                $leagues[$key]['ranking'] = $player_ranking['rank'];
-                $leagues[$key]['points'] = $player_ranking['total_pontuacao'];
+                if(isset($player_ranking['rank'])) {
+                    $leagues[$key]['ranking'] = $player_ranking['rank'];
+                    $leagues[$key]['points'] = $player_ranking['total_pontuacao'];
+                }
             }
 
 

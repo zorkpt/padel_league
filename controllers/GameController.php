@@ -103,6 +103,7 @@ class GameController
         $game_id = $_GET['id'];
         $game = self::getGameData($game_id);
         $league_id = $game['id_liga'];
+        $creator_id = $game['criador'];
 
         self::validateUserInput($currentUserId, $league_id);
 

@@ -26,7 +26,7 @@ class LeagueController
             // insert league creator as member of the league
             self::addMemberToLeague($creator_id, $league_id, 1); // 1 for admin
             self::addUserToRanking($creator_id,$league_id);
-            header('Location: /dashboard');
+            header('Location: /league?id=' . $league_id);
         }
         require_once '../views/liga/league_create.php';
     }
@@ -273,7 +273,11 @@ GROUP BY Ligas.id;'
     public static function getPlayerRankings($league_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT Ranking.id_utilizador, Utilizadores.nome_utilizador, Utilizadores.avatar, Ranking.pontos as total_pontuacao, Ranking.jogos_jogados, Ranking.jogos_ganhos as vitorias, Ranking.jogos_perdidos as derrotas, (Ranking.jogos_ganhos / Ranking.jogos_jogados * 100) as win_rate FROM Ranking
+        $stmt = $conn->prepare('SELECT Ranking.id_utilizador, Utilizadores.nome_utilizador, 
+       Utilizadores.avatar, Ranking.pontos as total_pontuacao, 
+       Ranking.jogos_jogados, Ranking.jogos_ganhos as vitorias, 
+       Ranking.jogos_perdidos as derrotas, COALESCE((Ranking.jogos_ganhos / NULLIF(Ranking.jogos_jogados, 0) * 100), 0) as win_rate
+ FROM Ranking
 JOIN Utilizadores ON Ranking.id_utilizador = Utilizadores.id
 WHERE Ranking.id_liga = :league_id 
 ORDER BY total_pontuacao DESC');

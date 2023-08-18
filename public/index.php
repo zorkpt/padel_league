@@ -21,7 +21,7 @@ require_once '../controllers/MailerController.php';
 
 $request_uri = explode('?', $_SERVER['REQUEST_URI'], 2);
 $db = dbConnect();
-session_start();
+SessionController::start();
 // Routing
 
 switch ($request_uri[0]) {
