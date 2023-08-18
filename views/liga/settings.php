@@ -57,7 +57,7 @@
                             type="submit">
                         Guardar Alterações
                     </button>
-                    <a href="/league/confirm-delete?id=<?= $_GET['id'] ?>"
+                    <a href="/league/confirm-delete?id=<?php SessionController::leagueForDeletion($leagueDetails['id']); echo $leagueDetails['id']; ?>"
                        class="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center   "
                        role="button">
                         Apagar Liga

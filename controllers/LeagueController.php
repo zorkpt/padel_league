@@ -218,7 +218,7 @@ GROUP BY Ligas.id;'
     public static function getLeagueInfo($league_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT nome, descricao, id_criador, data_criacao FROM Ligas WHERE id = :league_id');
+        $stmt = $conn->prepare('SELECT id, nome, descricao, id_criador, data_criacao FROM Ligas WHERE id = :league_id');
         $stmt->bindParam(':league_id', $league_id, PDO::PARAM_INT);
         $stmt->execute();
         $leagueInfo = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -480,7 +480,7 @@ ORDER BY total_pontuacao DESC');
     {
         checkLoggedIn();
         if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['id'])) {
-            $league_id = $_GET['id'];
+            $league_id = SessionController::getLeagueForDeletion();
             $user_id = $_SESSION['user']['id'];
 
 
@@ -641,7 +641,14 @@ ORDER BY total_pontuacao DESC');
         return true;
     }
 
+    public static function getTotalLeagues()
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT COUNT(*) FROM Ligas');
+        $stmt->execute();
 
+        return $stmt->fetchColumn();
+    }
 
 
 

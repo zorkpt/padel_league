@@ -9,6 +9,23 @@ class SessionController
         }
     }
 
+    public static function leagueForDeletion($id)
+    {
+        self::start();
+        $_SESSION['leagueForDeletion'] = $id;
+    }
+
+    public static function getLeagueForDeletion()
+    {
+        self::start();
+        if (isset($_SESSION['leagueForDeletion'])) {
+            $id = $_SESSION['leagueForDeletion'];
+            unset($_SESSION['leagueForDeletion']);
+            return $id;
+        }
+        return null;
+    }
+
     public static function setFlashMessage($key, $message)
     {
         self::start();
