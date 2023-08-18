@@ -24,23 +24,44 @@
 <header class="bg-gray-600 text-white text-center py-16">
     <h1 class="text-4xl font-bold">Bem-vindo à Liga-Padel.pt</h1>
     <p class="text-xl mt-2">A plataforma que te permite profissionalizar os teus jogos amigáveis de Padel.</p>
-    <button type="button"
+    <button onclick="location.href='/register'" type="button"
             class="mt-10 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-semibold rounded-lg text-lg px-14 py-4 mr-2 mb-2">
         Junta-te a nós!
     </button>
 
 </header>
 <main class="container flex-grow mx-auto px-6 py-8">
-    <h2 class="text-2xl font-bold text-gray-800">Como funciona</h2>
     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white p-6 rounded shadow">
-            <h3 class="text-xl font-bold">Organiza</h3>
-            <p class="mt-2 text-gray-600">Crie e gere ligas, agenda partidas e registra os resultados.</p>
+        <div class="bg-white p-6 rounded shadow space-y-6">
+            <h3 class="text-xl font-bold mb-4">Alguns números:</h3>
+
+            <div class="flex space-x-6">
+                <!-- Card para Jogos -->
+                <div class="flex-1 bg-gray-100 p-4 rounded shadow-md">
+                    <h4 class="text-lg font-bold mb-2">Total de Jogos:</h4>
+                    <p class="text-2xl text-gray-700"><?= $totalGames ?></p>
+                </div>
+
+                <!-- Card para Ligas -->
+                <div class="flex-1 bg-gray-100 p-4 rounded shadow-md">
+                    <h4 class="text-lg font-bold mb-2">Total de Ligas:</h4>
+                    <p class="text-2xl text-gray-700"><?= $totalLeagues ?></p>
+                </div>
+            </div>
         </div>
+
+
+
         <div class="bg-white p-6 rounded shadow">
-            <h3 class="text-xl font-bold">Participa</h3>
-            <p class="mt-2 text-gray-600">Inscreve-te em ligas, marca jogos e acompanha a tua progressão.</p>
+            <h3 class="text-xl font-bold">Juntaram-se a nós recentemente:</h3>
+            <?php foreach ($latestMembers as $user): ?>
+                <div class="flex items-center mt-4">
+                    <img class="w-8 h-8 rounded-full mr-2" src="<?= $user['avatar'] ?>" alt="<?= $user['nome_utilizador'] ?>'s avatar">
+                    <p class="text-gray-600"><?= $user['nome_utilizador'] ?></p>
+                </div>
+            <?php endforeach; ?>
         </div>
+
     </div>
 </main>
 <?php require BASE_PATH . "/views/partials/footer.php"; ?>

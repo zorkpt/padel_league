@@ -595,5 +595,12 @@ class GameController
     }
 
 
+    public static function getTotalGames() {
+        $conn = dbConnect();
+        $stmt = $conn->prepare("SELECT COUNT(*) as total FROM Jogos");
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
+    }
 }
 

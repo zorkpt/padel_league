@@ -568,5 +568,11 @@ class UserController
         }
     }
 
+    public static function getLastestMembers() {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT id, nome_utilizador, avatar FROM Utilizadores ORDER BY id DESC LIMIT 3');
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 

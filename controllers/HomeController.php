@@ -2,6 +2,11 @@
 
 class HomeController {
     public static function index() {
+
+        $latestMembers = UserController::getLastestMembers();
+        $totalGames = GameController::getTotalGames();
+        $totalLeagues = LeagueController::getTotalLeagues();
+
         if(isLoggedIn()) {
             header('Location: /dashboard');
             exit;
