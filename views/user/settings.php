@@ -57,7 +57,11 @@
                     </button>
                 </div>
             </form>
-
+            <?php if ($message = SessionController::getFlash('success_password_message')): ?>
+                <div class="text-green-500 mt-2 text-sm">
+                    <?php echo $message; ?>
+                </div>
+            <?php endif; ?>
             <h3>Alterar senha</h3>
             <form method="post" action="/user/updatePassword">
                 <label class="block text-sm font-medium leading-6 text-gray-900" for="old_password">Senha atual:</label><br>

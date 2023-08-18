@@ -23,7 +23,7 @@
                 <div class="text-gray-600 mb-10 space-y-1">
                     <div>Jogos: <?= $score['jogos_jogados']; ?> </div>
                     <div>Vitorias: <?= $score['jogos_ganhos']; ?></div>
-                    <div>Win Rate: <?= $win_loss_ratio; ?></div>
+                    <div>Win Rate: <?= $win_loss_ratio; ?>%</div>
                 </div>
                 <!-- Botão de Enviar Mensagem -->
                 <button class="mb-4 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300">

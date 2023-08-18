@@ -291,7 +291,7 @@ class UserController
             $stmt->bindParam(':password', $newPasswordHash);
             $stmt->execute();
 
-            SessionController::setFlashMessage('success_message', 'Senha alterada com sucesso.');
+            SessionController::setFlashMessage('success_password_message', 'Senha alterada com sucesso.');
             header('Location: /settings');
 
         }
