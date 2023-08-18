@@ -28,15 +28,48 @@ The objective of the Padel League Management Platform is to create a web-based s
 - **JavaScript:** Client-side programming.
 
 ## Getting Started
-
 ### Prerequisites
+
+#### Traditional Setup
 - A local PHP environment
 - MySQL server
 
+#### Docker Setup
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
 ### Installation
 
-Detailed instructions on how to set up your development environment and install the platform will be provided soon.
+#### Traditional Setup
+Detailed instructions on how to set up your traditional PHP environment and install the platform will be provided soon.
 
-## Contribution Guidelines
+#### Docker Setup
+1. **Clone the Repository**
+   ```bash
+   git clone git@github.com:zorkpt/padel_league.git
+   cd padel_league
 
-We welcome contributions from the community. Please read our contribution guidelines before making a pull request. Feel free to open an issue to discuss any changes or features you'd like to work on.
+
+2. **Create a `.env` File**
+   ```bash
+    cp .env.example .env
+    ```
+3. **Build the Docker Containers**
+    ```bash
+    docker-compose up --build -d
+    ```
+   - The application should now be running, and the database will be initialized using the backup.sql file.
+4. **Acess phpMyadmin**
+    ```bash
+    http://localhost:8080/
+    ```
+5. **Acess the application**
+    ```bash
+    http://localhost:8000/
+    ```
+   
+6. **Login**
+    ```bash
+    username: admin
+    password: admin
+    ```

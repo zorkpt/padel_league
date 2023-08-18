@@ -355,6 +355,9 @@ class UserController
 
     public  static function getDaysFromLastGame($user_id){
         $lastGameDate = GameController::getLastUserGameDate($user_id);
+        if(!$lastGameDate){
+            return 0;
+        }
         $lastGameDateTime = new DateTime($lastGameDate);
         $currentDateTime = new DateTime();
         $interval = $currentDateTime->diff($lastGameDateTime);
@@ -454,7 +457,7 @@ class UserController
 
     public static function logout()
     {
-        session_start();
+        SessionController::start();
         session_destroy();
         header('Location: /');
         exit;

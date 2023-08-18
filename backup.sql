@@ -361,8 +361,8 @@ CREATE TABLE `Utilizadores` (
 --
 
 INSERT INTO `Utilizadores` (`id`, `nome_utilizador`, `email`, `password_hash`, `data_registo`, `avatar`, `passwordResetToken`, `passwordResetExpires`) VALUES
-(1, 'zorkpt', 'hugopocas@gmail.com', '$2y$10$IOexb.BFGSrgfL/jkWv53utEXtg6B9Tjbci8HDskT5CamSJcig49i', '2023-06-23 17:06:41', '/uploads/64a73eead2be17.80003150.png', NULL, NULL),
-(6, 'admin', 'hugopocas@gmail.comddd', '$2y$10$0P1YRUZfBejv7FNvlzRpnOBH/sN8FCDI.Um.DYHTNRJDuGw3yV5G6', '2023-06-25 21:42:49', '/uploads/default.png', NULL, NULL),
+(1, 'zorkpt', 'dasdasdasd@gmail.com', '$2y$dsadsadutEXtg6B9Tjbci8HDskT5CamSJcig49i', '2023-06-23 17:06:41', '/uploads/64a73eead2be17.80003150.png', NULL, NULL),
+(6, 'admin', 'cxzcxzc@gmail.comddd', '$2y$10$nkUo84KBNy0SEtOz7aXUy.QlsKcsC9AULdLjV44fLx7k/s2luBVhy', '2023-06-25 21:42:49', '/uploads/default.png', NULL, NULL),
 (7, 'karapodre', 'dasda@dasd.dasd', 'dasdasd', '2023-06-25 21:42:49', '/uploads/default.png', NULL, NULL),
 (8, 'Joao', 'joao@dasd.dd', 'dasd', '2023-06-25 21:42:49', '/uploads/default.png', NULL, NULL),
 (9, 'user1', 'user@sada.dsad', '$2y$10$ru5cR16gtq7sRcrXRlrzYuBTROv2h8.TEL7ugjn6Y2qr3Gc47ghK6', '2023-06-27 21:56:36', '/uploads/default.png', NULL, NULL),
