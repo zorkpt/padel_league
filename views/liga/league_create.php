@@ -26,8 +26,16 @@
                     </div>
                 <?php endif; ?>
                 <div>
+
+                    <label for="tipo_liga" class="block mb-2 text-sm font-medium text-gray-900">
+                        Tipo de Liga
+                    </label>
+                        <select name="league_type">
+                            <option value="publica">Publica</option>
+                            <option value="privada">Privada</option>
+                        </select>
                     <label for="descricao"
-                           class="block mb-2 text-sm font-medium text-gray-900">Descrição</label>
+                           class="block mb-2 mt-2 text-sm font-medium text-gray-900">Descrição</label>
                     <textarea name="descricao" id="descricao"
                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                               placeholder="Breve descrição da Liga" required=""> </textarea>

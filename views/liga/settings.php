@@ -14,13 +14,13 @@
             <h2 class="text-2xl font-bold mb-4">Opções da Liga</h2>
             <form method="post">
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="visibility">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="tipo_liga">
                         Visibilidade da Liga:
                     </label>
                     <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            id="visibility">
-                        <option>Público</option>
-                        <option>Privado</option>
+                            id="tipo_liga" name="tipo_liga">
+                        <option <?php if($leagueDetails['tipo_liga'] == 'publica') echo 'selected' ?> value="publica">Público</option>
+                        <option <?php if($leagueDetails['tipo_liga'] == 'privada') echo 'selected' ?> value="privada">Privado</option>
                     </select>
                 </div>
                 <div class="mb-4">
