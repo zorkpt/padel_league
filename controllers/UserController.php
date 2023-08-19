@@ -15,7 +15,6 @@ class UserController
             $_SESSION['old']['email'] = $emailFromInvite;
         }
 
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $username = $_POST['username'];
             $email = $_POST['email'];
