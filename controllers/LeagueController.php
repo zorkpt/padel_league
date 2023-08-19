@@ -10,6 +10,7 @@ class LeagueController
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $name = $_POST['league'];
+            $league_type = $_POST['league_type'];
             $description = $_POST['descricao'];
             $creator_id = $_SESSION['user']['id'];
 
@@ -21,7 +22,7 @@ class LeagueController
 
             $invite_code = self::generateRandomInviteCode();
 
-            $league_id = self::insertLeague($name, $description, $creator_id, $invite_code);
+            $league_id = self::insertLeague($name, $description, $league_type, $creator_id, $invite_code);
 
             // insert league creator as member of the league
             self::addMemberToLeague($creator_id, $league_id, 1); // 1 for admin
@@ -31,13 +32,14 @@ class LeagueController
         require_once '../views/liga/league_create.php';
     }
 
-    private static function insertLeague($name, $description, $creator_id, $invite_code)
+    private static function insertLeague($name, $description, $league_type, $creator_id, $invite_code)
     {
         $creation_date = date("Y-m-d H:i:s");
         $conn = dbConnect();
-        $stmt = $conn->prepare('INSERT INTO Ligas (nome, descricao, id_criador, data_criacao, codigo_convite) VALUES (:name, :description, :creator_id, :creation_date, :invite_code)');
+        $stmt = $conn->prepare('INSERT INTO Ligas (nome, descricao, tipo_liga, id_criador, data_criacao, codigo_convite) VALUES (:name, :description, :league_type, :creator_id, :creation_date, :invite_code)');
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':league_type', $league_type);
         $stmt->bindParam(':creator_id', $creator_id);
         $stmt->bindParam(':creation_date', $creation_date);
         $stmt->bindParam(':invite_code', $invite_code);
@@ -155,6 +157,12 @@ GROUP BY Ligas.id;'
                 $lastFiveGames = self::lastGames($league_id, 5);
                 $ranking = self::getPlayerRankings($league_id);
 
+                if($leagueDetails['tipo_liga'] == 'publica'){
+                    $leagueDetails['tipo'] = 'Pública';
+                } else {
+                    $leagueDetails['tipo'] = 'Privada';
+                }
+
                 require_once '../views/liga/league.php';
             } else {
                 SessionController::setFlashMessage('error', 'Endereço Inválido');
@@ -218,7 +226,7 @@ GROUP BY Ligas.id;'
     public static function getLeagueInfo($league_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT id, nome, descricao, id_criador, data_criacao FROM Ligas WHERE id = :league_id');
+        $stmt = $conn->prepare('SELECT id, nome, descricao, tipo_liga, id_criador, data_criacao FROM Ligas WHERE id = :league_id');
         $stmt->bindParam(':league_id', $league_id, PDO::PARAM_INT);
         $stmt->execute();
         $leagueInfo = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -431,17 +439,18 @@ ORDER BY total_pontuacao DESC');
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newLeagueName = $_POST['league-name'];
                 $newLeagueDescription = $_POST['description'];
-
+                $newLeagueType = $_POST['tipo_liga'];
                 if (empty($newLeagueDescription) || empty($newLeagueName)) {
                     SessionController::setFlashMessage('error', 'Não pode ficar vazio.');
                     header('Location: ' . $_SERVER['REQUEST_URI']);
                     exit;
                 }
-
+                $typeUpdateStatus = self::updateLeagueType($league_id, $newLeagueType);
                 $nameUpdateStatus = self::updateLeagueName($league_id, $newLeagueName);
                 $descriptionUpdateStatus = self::updateLeagueDescription($league_id, $newLeagueDescription);
 
-                if ($nameUpdateStatus && $descriptionUpdateStatus) {
+                if ($nameUpdateStatus && $descriptionUpdateStatus && $typeUpdateStatus) {
+                    SessionController::setFlashMessage('league_settings_success', 'Informação da liga atualizada com sucesso.');
                     header('Location: /league?id=' . $league_id);
                     exit();
                 } else {
@@ -650,7 +659,14 @@ ORDER BY total_pontuacao DESC');
         return $stmt->fetchColumn();
     }
 
-
+    private static function updateLeagueType($leagueId, $leagueType): bool
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('UPDATE Ligas SET tipo_liga = :league_type WHERE id = :league_id');
+        $stmt->bindParam(':league_type', $leagueType);
+        $stmt->bindParam(':league_id', $leagueId);
+        return $stmt->execute();
+    }
 
 }
 

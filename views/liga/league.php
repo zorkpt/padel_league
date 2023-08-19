@@ -19,25 +19,42 @@ extract($ranking);
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <!--League Info-->
                 <div class="bg-white shadow-md rounded-lg p-6">
-                    <h2 class="text-2xl font-bold mb-4">Informações</h2>
-                    <div class="space-y-3">
-                        <div class="flex items-center space-x-2">
-                            <p><img class="w-8 h-8 rounded-full"
-                                    src="<?= $leagueDetails['avatar'] ?>"
-                                    alt="Avatar do criador"><?= htmlspecialchars($leagueDetails['nome_utilizador']) ?>
-                            </p>
+                    <div class="space-y-4 bg-white p-6 rounded-xl shadow-md">
+                        <!-- Título da Liga -->
+                        <div class="text-xl font-semibold text-indigo-600 border-b border-gray-200 pb-2">
+                            Liga <?= htmlspecialchars($leagueDetails['tipo']) ?>
                         </div>
-                        <p>
-                            <?= htmlspecialchars((new DateTime($leagueDetails['data_criacao']))->format("d/m/Y")) ?>
-                        </p>
-                        <p> <?= htmlspecialchars($leagueDetails['descricao']) ?>
+
+                        <!-- Informações do criador da Liga -->
+                        <div class="flex items-center space-x-4 mt-2">
+                            <img class="w-12 h-12 rounded-full" src="<?= $leagueDetails['avatar'] ?>"
+                                 alt="<?= $leagueDetails['nome_utilizador'] ?>'s avatar">
+                            <div class="text-sm text-gray-600">
+                                Organizada por: <span class="font-medium"><?= $leagueDetails['nome_utilizador'] ?></span>
+                            </div>
+                        </div>
+
+                        <!-- Data de criação -->
+                        <div class="text-sm text-gray-500 mt-2">
+                            Criada em: <?= htmlspecialchars((new DateTime($leagueDetails['data_criacao']))->format("d/m/Y")) ?>
+                        </div>
+
+                        <!-- Descrição da Liga -->
+                        <p class="mt-2 text-gray-700">
+                            <?= htmlspecialchars($leagueDetails['descricao']) ?>
                         </p>
                     </div>
+
                 </div>
 
 
                 <!-- Create Game and Invite Code -->
                 <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-1">
+                    <?php if ($message = SessionController::getFlash('league_settings_success')): ?>
+                        <div class="text-green-500 mt-2 text-sm">
+                            <?php echo $message; ?>
+                        </div>
+                    <?php endif; ?>
                     <h2 class="text-2xl font-bold mb-2">Gestão</h2>
                     <div class="overflow-y-auto max-h-[300px]">
                         <a href="/game/create?league_id=<?php echo $_GET['id']; ?>"
