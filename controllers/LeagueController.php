@@ -173,7 +173,7 @@ GROUP BY Ligas.id;'
                 $inviteCode = self::getInviteCode($league_id);
                 $lastFiveGames = self::lastGames($league_id, 5);
                 $ranking = self::getPlayerRankings($league_id);
-                
+
                 if ($leagueDetails['tipo_liga'] == 'publica') {
                     $leagueDetails['tipo'] = 'Pública';
                 } else {
@@ -702,6 +702,23 @@ ORDER BY total_pontuacao DESC');
         return $stmt->fetchColumn();
     }
 
+    public static function publicLeagues()
+    {
+        SessionController::start();
+        $conn = dbConnect();
+        $stmt = $conn->prepare('
+    SELECT Ligas.id, Ligas.nome, Ligas.descricao, Ligas.data_criacao, COUNT(Membros_Liga.id_liga) AS membros_ativos 
+    FROM Ligas 
+    LEFT JOIN Membros_Liga ON Ligas.id = Membros_Liga.id_liga
+    WHERE Ligas.tipo_liga = "publica"
+    GROUP BY Ligas.id, Ligas.nome, Ligas.descricao, Ligas.data_criacao
+');
+
+        $stmt->execute();
+        $openLeagues =  $stmt->fetchAll(PDO::FETCH_ASSOC);
+        require_once  '../views/liga/public_leagues.php';
+
+    }
 }
 
 
