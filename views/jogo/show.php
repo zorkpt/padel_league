@@ -61,7 +61,7 @@
                             <!-- Team 1 -->
                             <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ml-2 flex flex-col">
 
-                            <h2 class="mb-4 text-xl font-bold text-center text-gray-700">EQUIPA 1:</h2>
+                                <h2 class="mb-4 text-xl font-bold text-center text-gray-700">EQUIPA 1:</h2>
                                 <ul class="mb-4 text-gray-700 text-center">
                                     <?php foreach ($players as $player): ?>
                                         <?php if ($player['equipa'] == 1): ?>
@@ -76,7 +76,7 @@
                             </div>
                             <!-- Score -->
                             <div class="mx-4 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
-                            <h2 class="mb-1 text-xl font-bold text-center text-gray-700">Score:</h2>
+                                <h2 class="mb-1 text-xl font-bold text-center text-gray-700">Score:</h2>
                                 <div class="text-center mb-1 text-gray-700"><?= $game['team1_score'] ?>
                                     - <?= $game['team2_score'] ?></div>
                                 <div class="text-center text-gray-700">
@@ -120,7 +120,7 @@
 
                             <!-- Team 2 -->
                             <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
-                            <h2 class="mb-4 mr-3 text-xl font-bold text-center text-gray-700">EQUIPA 2:</h2>
+                                <h2 class="mb-4 mr-3 text-xl font-bold text-center text-gray-700">EQUIPA 2:</h2>
                                 <ul class="mb-4 text-gray-700 text-center">
                                     <?php foreach ($players as $player): ?>
                                         <?php if ($player['equipa'] == 2): ?>
@@ -158,107 +158,116 @@
 
                 <!--            end team games and registered players-->
 
-                <!-- start buttons-->
-                <div class="bg-white shadow-md rounded-lg p-6 md:col-span-2">
-                    <div class="mt-6 flex flex-col items-start gap-y-4">
-                        <!-- Altere para flex-col e items-start, e mude gap-x-6 para gap-y-4 -->
-                        <?php if ($game['status'] == GAME_OPEN): ?>
-                            <?php if (!in_array($currentUserId, $playerIds)): ?>
-                                <?php if (count($playerIds) < MAX_PLAYERS): ?>
-                                    <a class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                       href="game/subscribe?id=<?php echo $game['id']; ?>">Inscrever-se</a>
+                <?php if ($isVisitor): ?>
+                    <div class="bg-white shadow-md rounded-lg p-6 md:col-span-2">
+                        <div class="mt-6 flex flex-col items-start gap-y-4">
+                            <p class="mt-2 text-sm text-gray-500"> A ver o jogo como visitante </p>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!$isVisitor): ?>
+                    <!-- start buttons-->
+                    <div class="bg-white shadow-md rounded-lg p-6 md:col-span-2">
+                        <div class="mt-6 flex flex-col items-start gap-y-4">
+                            <!-- Altere para flex-col e items-start, e mude gap-x-6 para gap-y-4 -->
+                            <?php if ($game['status'] == GAME_OPEN): ?>
+                                <?php if (!in_array($currentUserId, $playerIds)): ?>
+                                    <?php if (count($playerIds) < MAX_PLAYERS): ?>
+                                        <a class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                           href="game/subscribe?id=<?php echo $game['id']; ?>">Inscrever-se</a>
+                                    <?php else: ?>
+                                        <div>Jogo cheio</div>
+                                    <?php endif; ?>
                                 <?php else: ?>
-                                    <div>Jogo cheio</div>
+                                    <a href="/game/unsubscribe?id=<?php echo $game['id']; ?>"
+                                       class="unsubscribe-button rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600">Cancelar
+                                        inscrição</a>
                                 <?php endif; ?>
-                            <?php else: ?>
-                                <a href="/game/unsubscribe?id=<?php echo $game['id']; ?>"
-                                   class="unsubscribe-button rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600">Cancelar
-                                    inscrição</a>
                             <?php endif; ?>
-                        <?php endif; ?>
 
 
-                        <!-- Verifique se o jogo pode ser trancado antes de exibir este botão -->
-                        <?php if ($game['status'] == GAME_OPEN): ?>
-                            <?php if (count($playerIds) == MAX_PLAYERS): ?>
-                                <a href="/game/lock?game_id=<?= $game['id'] ?>"
-                                   class="unsubscribe-button rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600">Trancar
-                                    Jogo</a>
-                            <?php else: ?>
-                                <div class="lock-button cursor-not-allowed opacity-50">Trancar Jogo</div>
+                            <!-- Verify if game can be locked  -->
+                            <?php if ($game['status'] == GAME_OPEN): ?>
+                                <?php if (count($playerIds) == MAX_PLAYERS): ?>
+                                    <a href="/game/lock?game_id=<?= $game['id'] ?>"
+                                       class="unsubscribe-button rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600">Trancar
+                                        Jogo</a>
+                                <?php else: ?>
+                                    <div class="lock-button cursor-not-allowed opacity-50">Trancar Jogo</div>
+                                <?php endif; ?>
                             <?php endif; ?>
-                        <?php endif; ?>
 
-                        <?php if (!isset($_SESSION['adjustTeams']) && $currentUserId == $creatorID && $game['status'] == GAME_LOCKED && !$resultsExist): ?>
-                            <a href="/game/change_teams?id=<?php echo $game['id']; ?>"
-                               class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Alterar
-                                Equipas</a>
-                        <?php endif; ?>
+                            <?php if (!isset($_SESSION['adjustTeams']) && $currentUserId == $creatorID && $game['status'] == GAME_LOCKED && !$resultsExist): ?>
+                                <a href="/game/change_teams?id=<?php echo $game['id']; ?>"
+                                   class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Alterar
+                                    Equipas</a>
+                            <?php endif; ?>
 
-                        <?php if ($game['status'] == GAME_LOCKED && $game['fim_jogo'] == 0): ?>
-                            <a href="/game/register_results?id=<?php echo $game['id']; ?>"
-                               class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Registrar
-                                Resultados</a>
-                        <?php else: ?>
-                            <div class="cursor-not-allowed opacity-50">Registrar Resultados</div>
-                        <?php endif; ?>
-
+                            <?php if ($game['status'] == GAME_LOCKED && $game['fim_jogo'] == 0): ?>
+                                <a href="/game/register_results?id=<?php echo $game['id']; ?>"
+                                   class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Registrar
+                                    Resultados</a>
+                            <?php else: ?>
+                                <div class="cursor-not-allowed opacity-50">Registrar Resultados</div>
+                            <?php endif; ?>
 
 
-                        <?php if ($game['status'] == GAME_LOCKED && $resultsExist): ?>
-                            <form action="/game/finish" method="POST">
-                                <input type="hidden" name="game_id" value="<?php echo $game['id']; ?>">
-                                <input type="submit" value="Terminar Jogo"
-                                       class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                            </form>
-                        <?php else: ?>
-                            <div class="cursor-not-allowed opacity-50">Terminar Jogo</div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <!--end buttons-->
 
-
-                <!-- start change teams-->
-                <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-2 space-y-4">
-                    <!-- adicionar space-y-4 -->
-                    <div class="overflow-y-auto max-h-[400px]"> <!-- aumentar a altura máxima para 400px -->
-                        <?php if (isset($_SESSION['adjustTeams']) && $currentUserId === $creatorID): ?>
-                            <?php if ($game['status'] == GAME_LOCKED && !$resultsExist): ?>
-                                <form action="/game/change_teams" method="POST">
+                            <?php if ($game['status'] == GAME_LOCKED && $resultsExist): ?>
+                                <form action="/game/finish" method="POST">
                                     <input type="hidden" name="game_id" value="<?php echo $game['id']; ?>">
-                                    <div class="mt-4 flex justify-center items-center">
-                                        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
-                                            <h2 class="mb-4 text-xl font-bold text-center text-gray-700">Alterar
-                                                equipas:</h2>
-                                            <ul class="mb-4 text-gray-700 text-center">
-                                                <?php foreach ($players as $player): ?>
-                                                    <li class="flex items-center justify-center">
-                                                        <img src="<?= $player['avatar'] ?>" alt="Avatar"
-                                                             class="w-8 h-8 rounded-full mr-2">
-                                                        <?= $player['nome_utilizador'] ?>
-                                                        <select class="ml-5 mb-3" name="team[<?= $player['id'] ?>]">
-                                                            <option value="1" <?= $player['equipa'] == 1 ? 'selected' : '' ?>>
-                                                                Equipa 1
-                                                            </option>
-                                                            <option value="2" <?= $player['equipa'] == 2 ? 'selected' : '' ?>>
-                                                                Equipa 2
-                                                            </option>
-                                                        </select>
-                                                    </li>
-                                                <?php endforeach; ?>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <input type="submit" value="Alterar equipas"
-                                           class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-4">
-                                    <!-- adicionar mb-4 -->
+                                    <input type="submit" value="Terminar Jogo"
+                                           class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                                 </form>
+                            <?php else: ?>
+                                <div class="cursor-not-allowed opacity-50">Terminar Jogo</div>
                             <?php endif; ?>
-                        <?php endif; ?>
+                        </div>
                     </div>
-                </div>
+                    <!--end buttons-->
 
+                    <!-- start change teams-->
+                    <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-2 space-y-4">
+                        <!-- adicionar space-y-4 -->
+                        <div class="overflow-y-auto max-h-[400px]"> <!-- aumentar a altura máxima para 400px -->
+                            <?php if (isset($_SESSION['adjustTeams']) && $currentUserId === $creatorID): ?>
+                                <?php if ($game['status'] == GAME_LOCKED && !$resultsExist): ?>
+                                    <form action="/game/change_teams" method="POST">
+                                        <input type="hidden" name="game_id" value="<?php echo $game['id']; ?>">
+                                        <div class="mt-4 flex justify-center items-center">
+                                            <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
+                                                <h2 class="mb-4 text-xl font-bold text-center text-gray-700">Alterar
+                                                    equipas:</h2>
+                                                <ul class="mb-4 text-gray-700 text-center">
+                                                    <?php foreach ($players as $player): ?>
+                                                        <li class="flex items-center justify-center">
+                                                            <img src="<?= $player['avatar'] ?>" alt="Avatar"
+                                                                 class="w-8 h-8 rounded-full mr-2">
+                                                            <?= $player['nome_utilizador'] ?>
+                                                            <select class="ml-5 mb-3" name="team[<?= $player['id'] ?>]">
+                                                                <option value="1" <?= $player['equipa'] == 1 ? 'selected' : '' ?>>
+                                                                    Equipa 1
+                                                                </option>
+                                                                <option value="2" <?= $player['equipa'] == 2 ? 'selected' : '' ?>>
+                                                                    Equipa 2
+                                                                </option>
+                                                            </select>
+                                                        </li>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <input type="submit" value="Alterar equipas"
+                                               class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-4">
+                                        <!-- adicionar mb-4 -->
+                                    </form>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                <?php endif ?>
             </div>
         </div>
 

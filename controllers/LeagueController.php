@@ -26,7 +26,7 @@ class LeagueController
 
             // insert league creator as member of the league
             self::addMemberToLeague($creator_id, $league_id, 1); // 1 for admin
-            self::addUserToRanking($creator_id,$league_id);
+            self::addUserToRanking($creator_id, $league_id);
             header('Location: /league?id=' . $league_id);
         }
         require_once '../views/liga/league_create.php';
@@ -44,6 +44,7 @@ class LeagueController
         $stmt->bindParam(':creation_date', $creation_date);
         $stmt->bindParam(':invite_code', $invite_code);
         $stmt->execute();
+
         return $conn->lastInsertId();
     }
 
@@ -65,6 +66,7 @@ class LeagueController
         for ($i = 0; $i < $length; $i++) {
             $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
+
         return $randomString;
     }
 
@@ -123,7 +125,7 @@ GROUP BY Ligas.id;'
 
                 $invitationSent = self::inviteToLeague($league_id, $leagueDetails['nome'], $invite_email);
 
-                if($invitationSent){
+                if ($invitationSent) {
                     SessionController::setFlashMessage('success', 'Convite enviado com sucesso para ' . $invite_email);
                 } else {
                     SessionController::setFlashMessage('error', 'Ocorreu um erro ao enviar o convite. Por favor tente novamente.');
@@ -140,15 +142,30 @@ GROUP BY Ligas.id;'
             if (isset($_GET['id'])) {
                 $league_id = $_GET['id'];
                 $user_id = $_SESSION['user']['id'];
-                // Verify if user is a member of the league
-                if (!self::isUserMemberOfLeague($user_id, $league_id)) {
-                    SessionController::setFlashMessage('access_error', 'Tu não és membro desta liga.');
+                $leagueDetails = self::getLeagueInfo($league_id);
+
+                // Ensure the league exists
+                if (!$leagueDetails) {
+                    SessionController::setFlashMessage('error', 'Liga não encontrada.');
                     header('Location: /error');
                     exit();
                 }
 
+                $isLeagueMember = self::isUserMemberOfLeague($user_id, $league_id);
+                $isVisitor = false;
+                // Verify if user is a member of the league
+                if (!$isLeagueMember && $leagueDetails['tipo_liga'] == 'privada') {
+                    SessionController::setFlashMessage('access_error', 'Tu não és membro desta liga/Liga privada.');
+                    header('Location: /error');
+                    exit();
+                }
+
+                // Verify if user is a visitor of the league
+                if (!$isLeagueMember && $leagueDetails['tipo_liga'] == 'publica') {
+                    $isVisitor = true;
+                }
+
                 // Get all league data
-                $leagueDetails = self::getLeagueInfo($league_id);
                 $leagueGames = self::getLeagueGames($league_id);
                 $leagueMembers = self::getLeagueMembers($league_id);
                 $openLeagueGames = self::getLeagueGames($league_id, GAME_STATUS_OPEN);
@@ -156,8 +173,8 @@ GROUP BY Ligas.id;'
                 $inviteCode = self::getInviteCode($league_id);
                 $lastFiveGames = self::lastGames($league_id, 5);
                 $ranking = self::getPlayerRankings($league_id);
-
-                if($leagueDetails['tipo_liga'] == 'publica'){
+                
+                if ($leagueDetails['tipo_liga'] == 'publica') {
                     $leagueDetails['tipo'] = 'Pública';
                 } else {
                     $leagueDetails['tipo'] = 'Privada';
@@ -220,6 +237,7 @@ GROUP BY Ligas.id;'
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
         $membership = $stmt->fetch(PDO::FETCH_ASSOC);
+
         return $membership != false;  // return true if its a member, false otherwise
     }
 
@@ -248,6 +266,7 @@ GROUP BY Ligas.id;'
         $stmt = $conn->prepare('SELECT Utilizadores.nome_utilizador, Utilizadores.id, Utilizadores.avatar, Membros_Liga.data_admissao FROM Utilizadores JOIN Membros_Liga ON Utilizadores.id = Membros_Liga.id_utilizador WHERE Membros_Liga.id_liga = :league_id');
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -274,6 +293,7 @@ GROUP BY Ligas.id;'
         }
 
         $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -433,7 +453,7 @@ ORDER BY total_pontuacao DESC');
             $leagueDetails = self::getLeagueInfo($league_id);
 
             // Check if it is admin of the league
-            self::checkLeagueCreator($league_id,$user_id);
+            self::checkLeagueCreator($league_id, $user_id);
 
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -547,7 +567,8 @@ ORDER BY total_pontuacao DESC');
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public static function checkLeagueCreator($league_id, $user_id){
+    public static function checkLeagueCreator($league_id, $user_id)
+    {
         $leagueDetails = self::getLeagueInfo($league_id);
         if (!isset($leagueDetails['id_criador'])) {
             SessionController::setFlashMessage('access_error', 'Liga inválida.');
@@ -562,7 +583,8 @@ ORDER BY total_pontuacao DESC');
         }
     }
 
-    public static function inviteToLeague($leagueId, $leagueName, $email) {
+    public static function inviteToLeague($leagueId, $leagueName, $email)
+    {
         $conn = dbConnect();
 
         // Generate a unique invitation code
@@ -578,9 +600,9 @@ ORDER BY total_pontuacao DESC');
         // Send the invitation email
         $mailer = new MailerController();
         $invitationLink = "https://liga-padel.pt/accept-invite?code=" . $invitationCode;
+
         return $mailer->sendLeagueInvitationEmail($email, $leagueName, $invitationLink);
     }
-
 
 
     public static function acceptInvitation()
@@ -616,7 +638,8 @@ ORDER BY total_pontuacao DESC');
         }
     }
 
-    public static function processInvitation($userId, $inviteCode) {
+    public static function processInvitation($userId, $inviteCode)
+    {
         $conn = dbConnect();
 
         // Get the invitation data
@@ -665,7 +688,18 @@ ORDER BY total_pontuacao DESC');
         $stmt = $conn->prepare('UPDATE Ligas SET tipo_liga = :league_type WHERE id = :league_id');
         $stmt->bindParam(':league_type', $leagueType);
         $stmt->bindParam(':league_id', $leagueId);
+
         return $stmt->execute();
+    }
+
+    public static function getLeagueType($league_id)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT tipo_liga FROM Ligas WHERE id = :league_id');
+        $stmt->bindParam(':league_id', $league_id);
+        $stmt->execute();
+
+        return $stmt->fetchColumn();
     }
 
 }
