@@ -163,6 +163,9 @@ switch ($request_uri[0]) {
         }
         break;
 
+        case '/league/public':
+            LeagueController::publicLeagues();
+            break;
     default:
         header('HTTP/1.0 404 Not Found');
         require '../views/404.php';
