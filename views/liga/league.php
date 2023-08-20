@@ -49,6 +49,13 @@ extract($ranking);
 
 
                 <!-- Create Game and Invite Code -->
+                <?php if($isVisitor): ?>
+                <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-1">
+                    <h2 class="text-2xl font-bold mb-2">Visitante</h2>
+                    <p class="block text-sm font-medium text-gray-700">A ver esta liga como visitante.</p>
+                </div>
+                <?php endif; ?>
+                <?php if(!$isVisitor): ?>
                 <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-1">
                     <?php if ($message = SessionController::getFlash('league_settings_success')): ?>
                         <div class="text-green-500 mt-2 text-sm">
@@ -101,6 +108,7 @@ extract($ranking);
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <!-- Last 5 Matches -->
                 <div class="h-[300px] md:col-span-2 bg-white p-4 rounded-lg shadow-md overflow-y-auto">

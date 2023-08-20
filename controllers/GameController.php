@@ -99,25 +99,33 @@ class GameController
 
     public static function show()
     {
+        SessionController::start();
         $currentUserId = $_SESSION['user']['id'];
         $game_id = $_GET['id'];
         $game = self::getGameData($game_id);
         $league_id = $game['id_liga'];
         $creator_id = $game['criador'];
+        $isVisitor = false;
 
-        self::validateUserInput($currentUserId, $league_id);
+
+      //  self::validateUserInput($currentUserId, $league_id);
 
         $membership = LeagueController::checkLeagueMembership($game['id_liga'], $currentUserId);
+        $league_type = LeagueController::getLeagueType($league_id);
+
+        if($league_type == 'publica' && !$membership) {
+            $isVisitor = true;
+        }
 
         // if the game and membership are found
-        if ($game && $membership) {
+        if ($game && $membership || $game && $isVisitor) {
             $players = self::getPlayersInGame($game_id);
             $playerIds = self::getPlayerIdsInGame($game_id);
             $resultsExist = self::resultsExist($game_id);
 
             require_once '../views/jogo/show.php';
-        } else {
-            SessionController::setFlashMessage('error', 'Link Inválido.');
+        } elseif($league_type == 'privada' && !$membership) {
+            SessionController::setFlashMessage('error', 'Esta Liga é Privada.');
             header('Location: /error');
         }
     }
