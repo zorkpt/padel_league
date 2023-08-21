@@ -7,6 +7,7 @@
             <tr class="bg-gray-50">
                 <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase"></th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"></th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jogos</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vitorias
                 </th>
@@ -18,13 +19,18 @@
                 <tr>
                     <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-500">
                         #<?= $row['rank'] ?></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td >
                         <div class="flex items-center">
                             <img class="w-8 h-8 rounded-full mr-2" src="<?= $row['avatar'] ?>"
                                  alt="<?= $row['nome_utilizador'] ?>'s avatar">
                             <a class="text-blue-500 underline hover:text-blue-600"
                                href="/profile?id=<?= $row['id_utilizador'] ?>"><?= $row['nome_utilizador'] ?></a>
                         </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <?php foreach ($row['last_3_results'] as $result): ?>
+                            <div class="inline-block w-4 h-4 mx-1" style="background-color: <?php echo $result == 'V' ? 'green' : 'red'; ?>"></div>
+                        <?php endforeach; ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['jogos_jogados'] ?></td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $row['vitorias'] ?></td>
