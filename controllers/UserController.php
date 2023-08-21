@@ -378,6 +378,7 @@ class UserController
     public static function settings()
     {
         checkLoggedIn();
+        $user = self::getUserData($_SESSION['user']['id']);
         require_once BASE_PATH . '/views/user/settings.php';
     }
 
@@ -429,8 +430,6 @@ class UserController
         }
         require_once BASE_PATH . '/views/user/profile.php';
     }
-
-
 
     public static function getUserData($user_id) {
         $conn = dbConnect();
