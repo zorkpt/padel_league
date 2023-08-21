@@ -36,3 +36,7 @@
                 </tbody>
             </table>
         </div>
+    </div>
+</main>
+
+<?php require BASE_PATH . "/views/partials/footer.php"; ?>
