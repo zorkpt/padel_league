@@ -47,12 +47,12 @@ extract($ranking);
 
                 </div>
 
-
                 <!-- Create Game and Invite Code -->
                 <?php if($isVisitor): ?>
                 <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-1">
                     <h2 class="text-2xl font-bold mb-2">Visitante</h2>
                     <p class="block text-sm font-medium text-gray-700">A ver esta liga como visitante.</p>
+                    <a href="/league/request?liga=<?= $leagueDetails['id'] ?>">Clica Aqui para ter enviares pedido de entrada</a>
                 </div>
                 <?php endif; ?>
                 <?php if(!$isVisitor): ?>

@@ -15,6 +15,17 @@ class SessionController
         $_SESSION['leagueForDeletion'] = $id;
     }
 
+    public static function get($key)
+    {
+        self::start();
+        if (isset($_SESSION[$key])) {
+            $value = $_SESSION[$key];
+            unset($_SESSION[$key]);
+            return $value;
+        }
+        return null;
+    }
+
     public static function getLeagueForDeletion()
     {
         self::start();

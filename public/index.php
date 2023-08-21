@@ -85,6 +85,10 @@ switch ($request_uri[0]) {
         LeagueController::joinLeague();
         break;
 
+    case '/league/request':
+        LeagueController::requestJoinLeague();
+        break;
+
     // Página de agendamento do jogo
     case '/game/schedule':
         GameController::schedule();
