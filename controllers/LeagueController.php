@@ -168,11 +168,43 @@ GROUP BY Ligas.id;'
                 // Get all league data
                 $leagueGames = self::getLeagueGames($league_id);
                 $leagueMembers = self::getLeagueMembers($league_id);
+
+                // Get the last 3 games results for each member
+                foreach ($leagueMembers as &$member) {
+                    $gamesResults = self::getLeagueMemberLastGamesResults($league_id, $member['id']);
+
+                    $last3Results = [];
+                    foreach ($gamesResults as $game) {
+                        if ($game['equipa_jogador'] == 1) {
+                            // if player was in team 1
+                            $last3Results[] = $game['score_equipa1'] > $game['score_equipa2'] ? 'V' : 'D';
+                        } else {
+                            // if player was in team 2
+                            $last3Results[] = $game['score_equipa2'] > $game['score_equipa1'] ? 'V' : 'D';
+                        }
+                    }
+
+                    // Guarantee that the array has 3 elements
+                    $member['last_3_results'] = array_slice($last3Results, 0, 3);
+                }
+                unset($member);
+
                 $openLeagueGames = self::getLeagueGames($league_id, GAME_STATUS_OPEN);
                 $ongoingLeagueGames = self::getLeagueGames($league_id, GAME_STATUS_ONGOING);
                 $inviteCode = self::getInviteCode($league_id);
                 $lastFiveGames = self::lastGames($league_id, 5);
                 $ranking = self::getPlayerRankings($league_id);
+
+                // add W/L info to ranking array
+                foreach ($ranking as &$rank) {
+                    foreach ($leagueMembers as $member) {
+                        if ($rank['id_utilizador'] == $member['id']) {
+                            $rank['last_3_results'] = $member['last_3_results'];
+                            break;
+                        }
+                    }
+                }
+                unset($rank);
 
                 if ($leagueDetails['tipo_liga'] == 'publica') {
                     $leagueDetails['tipo'] = 'Pública';
@@ -263,7 +295,30 @@ GROUP BY Ligas.id;'
     public static function getLeagueMembers($league_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT Utilizadores.nome_utilizador, Utilizadores.id, Utilizadores.avatar, Membros_Liga.data_admissao FROM Utilizadores JOIN Membros_Liga ON Utilizadores.id = Membros_Liga.id_utilizador WHERE Membros_Liga.id_liga = :league_id');
+        $stmt = $conn->prepare('SELECT Utilizadores.nome_utilizador, Utilizadores.id, Utilizadores.avatar, 
+        Membros_Liga.data_admissao 
+        FROM Utilizadores 
+        JOIN Membros_Liga ON Utilizadores.id = Membros_Liga.id_utilizador 
+        WHERE Membros_Liga.id_liga = :league_id');
+        $stmt->bindParam(':league_id', $league_id);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getLeagueMemberLastGamesResults($league_id, $player_id){
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT
+            j.id AS jogo_id,
+            jj.equipa AS equipa_jogador,
+            j.team1_score AS score_equipa1,
+            j.team2_score AS score_equipa2
+        FROM Jogadores_Jogo AS jj
+        JOIN Jogos AS j ON jj.id_jogo = j.id
+        WHERE jj.id_utilizador = :player_id AND j.id_liga = :league_id AND j.status = 0
+        ORDER BY j.data_hora DESC
+        LIMIT 3;');
+        $stmt->bindParam(':player_id', $player_id);
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
 
@@ -707,6 +762,8 @@ ORDER BY total_pontuacao DESC');
     public static function publicLeagues()
     {
         SessionController::start();
+        checkLoggedIn();
+
         $conn = dbConnect();
         $stmt = $conn->prepare('
     SELECT Ligas.id, Ligas.nome, Ligas.descricao, Ligas.data_criacao, COUNT(Membros_Liga.id_liga) AS membros_ativos 
