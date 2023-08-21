@@ -5,6 +5,7 @@ extract($leagueMembers);
 extract($ongoingLeagueGames);
 extract($lastFiveGames);
 extract($ranking);
+extract($joinRequests);
 ?>
 <?php extract($openLeagueGames); ?>
 <?php $header = $leagueDetails['nome'] ?>
@@ -47,14 +48,17 @@ extract($ranking);
 
                 </div>
 
-
                 <!-- Create Game and Invite Code -->
                 <?php if($isVisitor): ?>
-                <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-1">
-                    <h2 class="text-2xl font-bold mb-2">Visitante</h2>
-                    <p class="block text-sm font-medium text-gray-700">A ver esta liga como visitante.</p>
-                </div>
+                    <div class="bg-white shadow-md rounded-lg overflow-hidden p-6 md:col-span-1 space-y-3">
+                        <h2 class="text-2xl font-bold text-center mb-4">Visitante</h2>
+                        <p class="text-sm font-medium text-gray-700 text-center">A ver esta liga como visitante.</p>
+                        <div class="flex justify-center">
+                            <a class="unsubscribe-button inline-block mt-4 rounded-md bg-green-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600" href="/league/request?liga=<?= $leagueDetails['id'] ?>">Enviar Pedido</a>
+                        </div>
+                    </div>
                 <?php endif; ?>
+
                 <?php if(!$isVisitor): ?>
                 <div class="bg-white shadow-md rounded-lg overflow-hidden p-4 md:col-span-1">
                     <?php if ($message = SessionController::getFlash('league_settings_success')): ?>
@@ -178,7 +182,17 @@ extract($ranking);
             <?php require BASE_PATH . '/views/partials/ongoing_games.php'; ?>
             <?php require BASE_PATH . '/views/partials/league_members.php'; ?>
 
+            <?php if($_SESSION['user']['id'] == $leagueDetails['id_criador']): ?>
+            <div class="h-[300px] md:col-span-2 bg-white p-4 rounded-lg shadow-md overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-2">Pedidos para se Juntar</h2>
 
+                <?php if (count($joinRequests) == 0): ?>
+                    <p>Não existem pedidos para se juntar à liga.</p>
+                <?php else: ?>
+                <?php require BASE_PATH . '/views/partials/join_requests.php'; ?>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </div>
 
 
