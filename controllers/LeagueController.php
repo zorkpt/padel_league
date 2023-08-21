@@ -796,7 +796,7 @@ ORDER BY total_pontuacao DESC');
     private static function isUserPendingMemberOfLeague($leagueId, $userId)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT COUNT(*) FROM Lista_Espera WHERE id_liga = :league_id AND id_utilizador = :user_id');
+        $stmt = $conn->prepare('SELECT COUNT(*) FROM Lista_Espera WHERE id_liga = :league_id AND id_utilizador = :user_id AND status = "pendente"');
         $stmt->bindParam(':league_id', $leagueId);
         $stmt->bindParam(':user_id', $userId);
         $stmt->execute();
@@ -931,6 +931,72 @@ ORDER BY total_pontuacao DESC');
         }
 
         header("Location: /league?id=$leagueId");
+    }
+
+
+    public static function leaveLeague(){
+        SessionController::start();
+        checkLoggedIn();
+
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            SessionController::setFlashMessage('error', 'Método não suportado.');
+            header('Location: /error');
+            exit();
+        }
+        $leagueAdmin = self::getLeagueAdmin($_POST['league_id']);
+        $leagueId = $_POST['league_id'];
+        $userId = $_SESSION['user']['id'];
+        $userInfo = UserController::getUserData($userId);
+
+        if (!self::isUserMemberOfLeague($userId, $leagueId)) {
+            SessionController::setFlashMessage('error', 'Não pertences a esta liga.');
+            header('Location: /error');
+            exit();
+        }
+
+        if (!self::removeUserFromLeague($userId, $leagueId)) {
+            SessionController::setFlashMessage('error', 'Ocorreu um erro ao sair da liga.');
+            header('Location: /error');
+            exit();
+        }
+
+        if (!self::removeUserFromRanking($userId, $leagueId)) {
+            SessionController::setFlashMessage('error', 'Ocorreu um erro ao sair do ranking.');
+            header('Location: /error');
+            exit();
+        }
+
+        NotificationController::create($leagueAdmin, $userInfo['nome_utilizador'] . ' saiu da liga', '/league?id=' . $leagueId);
+        SessionController::setFlashMessage('success', 'Saiu da liga com sucesso.');
+        header("Location: /dashboard");
+
+
+    }
+
+    private static function removeUserFromLeague($userId, $leagueId)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('
+            DELETE FROM Membros_Liga
+            WHERE id_utilizador = :user_id AND id_liga = :league_id
+        ');
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->bindParam(':league_id', $leagueId);
+
+        return $stmt->execute();
+    }
+
+    private static function removeUserFromRanking($userId, $leagueId)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('
+            DELETE FROM Ranking
+            WHERE id_utilizador = :user_id AND id_liga = :league_id
+        ');
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->bindParam(':league_id', $leagueId);
+
+        return $stmt->execute();
     }
 }
 

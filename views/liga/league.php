@@ -80,6 +80,17 @@ extract($joinRequests);
                             </a>
                         <?php endif; ?>
 
+                        <?php if ($_SESSION['user']['id'] != $leagueDetails['id_criador']): ?>
+                            <button
+                                    id="triggerModal"
+                                    class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-red-600 rounded shadow ripple hover:shadow-lg hover:bg-red-800 focus:outline-none"
+                            >
+                                Deixar Liga
+                            </button>
+                            <input type="hidden" id="hiddenLeagueId" value="<?= $leagueDetails['id'] ?>">
+                        <?php endif; ?>
+
+
                         <div class="mt-2">
                             <label for="invite-code" class="block text-sm font-medium text-gray-700">Código de
                                 convite</label>
@@ -199,7 +210,46 @@ extract($joinRequests);
     </main>
 
 
-<?php require BASE_PATH . "/views/partials/footer.php"; ?>
+    <div id="confirmationModal" class="fixed inset-0 flex items-center justify-center z-50 invisible">
+        <div class="modal-content bg-white p-6 rounded shadow-lg w-1/3">
+            <p class="mb-4">Tem certeza de que deseja deixar a liga?</p>
+            <div class="flex justify-end">
+                <button id="confirmLeave" class="bg-red-600 text-white px-4 py-2 rounded mr-2 hover:bg-red-700">Sim, deixar</button>
+                <button id="cancelLeave" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <form id="leaveLeagueForm" method="post" action="/league/leave">
+        <input type="hidden" name="league_id" value="<?= $leagueDetails['id'] ?>">
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const modal = document.getElementById('confirmationModal');
+            const confirmButton = document.getElementById('confirmLeave');
+            const cancelButton = document.getElementById('cancelLeave');
+            const leaveLeagueForm = document.getElementById('leaveLeagueForm');
+            const triggerModalButton = document.getElementById('triggerModal');
+
+            triggerModalButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                modal.classList.remove('invisible');
+            });
+
+            // Quando o botão confirmar no modal for clicado, envia o formulário.
+            confirmButton.addEventListener('click', function() {
+                modal.classList.add('invisible');
+                leaveLeagueForm.submit();
+            });
+
+            // Quando o botão cancelar no modal for clicado, apenas fecha o modal.
+            cancelButton.addEventListener('click', function() {
+                modal.classList.add('invisible');
+            });
+        });
 
 
 
+    </script>
+        <?php require BASE_PATH . "/views/partials/footer.php"; ?>
