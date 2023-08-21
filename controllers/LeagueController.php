@@ -109,7 +109,6 @@ GROUP BY Ligas.id;'
         checkLoggedIn();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
             if (isset($_POST['email']) && filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
                 $league_id = $_GET['id'];
                 $user_id = $_SESSION['user']['id'];
@@ -133,17 +132,18 @@ GROUP BY Ligas.id;'
 
                 header("Location: /league?id=$league_id");
                 exit();
-            } else {
-                SessionController::setFlashMessage('error', 'Por favor insira um e-mail válido.');
-                header('Location: ' . $_SERVER['REQUEST_URI']);
-                exit();
             }
+
+            SessionController::setFlashMessage('error', 'Por favor insira um e-mail válido.');
+            header('Location: ' . $_SERVER['REQUEST_URI']);
+            exit();
+
         } else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             if (isset($_GET['id'])) {
                 $league_id = $_GET['id'];
                 $user_id = $_SESSION['user']['id'];
                 $leagueDetails = self::getLeagueInfo($league_id);
-
+                $joinRequests = self::getLeagueJoinRequests($league_id);
                 // Ensure the league exists
                 if (!$leagueDetails) {
                     SessionController::setFlashMessage('error', 'Liga não encontrada.');
@@ -232,14 +232,14 @@ GROUP BY Ligas.id;'
     public static function isUserMemberOfLeague($user_id, $league_id)
     {
         $conn = dbConnect();
-        $stmt = $conn->prepare('SELECT * FROM Membros_Liga WHERE id_utilizador = :user_id AND id_liga = :league_id');
+        $stmt = $conn->prepare('SELECT 1 FROM Membros_Liga WHERE id_utilizador = :user_id AND id_liga = :league_id');
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':league_id', $league_id);
         $stmt->execute();
-        $membership = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $membership != false;  // return true if its a member, false otherwise
+        return $stmt->rowCount() > 0;
     }
+
 
     public static function getLeagueInfo($league_id)
     {
@@ -422,7 +422,8 @@ ORDER BY total_pontuacao DESC');
         $stmt = $conn->prepare("INSERT INTO Membros_Liga (id_utilizador, id_liga) VALUES (:user_id, :league_id)");
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':league_id', $league_id);
-        $stmt->execute();
+
+        return $stmt->execute();
     }
 
     private static function addUserToRanking($user_id, $league_id)
@@ -432,7 +433,8 @@ ORDER BY total_pontuacao DESC');
                             VALUES (:user_id, :league_id, 0, 0, 0, 0)");
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':league_id', $league_id);
-        $stmt->execute();
+
+        return $stmt->execute();
     }
 
     public static function settings()
@@ -715,14 +717,14 @@ ORDER BY total_pontuacao DESC');
 ');
 
         $stmt->execute();
-        $openLeagues =  $stmt->fetchAll(PDO::FETCH_ASSOC);
-        require_once  '../views/liga/public_leagues.php';
+        $openLeagues = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        require_once '../views/liga/public_leagues.php';
 
     }
 
 
-
-    public static function  requestJoinLeague() {
+    public static function requestJoinLeague()
+    {
         SessionController::start();
         checkLoggedIn();
 
@@ -732,28 +734,28 @@ ORDER BY total_pontuacao DESC');
             $leagueData = self::getLeagueInfo($leagueId);
 
             // Check if the league exists
-            if(!$leagueData) {
+            if (!$leagueData) {
                 SessionController::setFlashMessage('error', 'Liga não encontrada.');
                 header('Location: /error');
                 exit();
             }
 
             // Check if the league is public
-            if($leagueData['tipo_liga'] != 'publica') {
+            if ($leagueData['tipo_liga'] != 'publica') {
                 SessionController::setFlashMessage('error', 'Não podes pedir para entrar numa liga privada.');
                 header('Location: /error');
                 exit();
             }
 
             // Check if the user is already a member of the league
-            if(self::isUserMemberOfLeague($leagueId, $_SESSION['user']['id'])) {
+            if (self::isUserMemberOfLeague($leagueId, $_SESSION['user']['id'])) {
                 SessionController::setFlashMessage('error', 'Já és membro desta liga.');
                 header('Location: /error');
                 exit();
             }
 
             // Check if the user has a pending request to join the league
-            if(self::isUserPendingMemberOfLeague($leagueId, $_SESSION['user']['id'])) {
+            if (self::isUserPendingMemberOfLeague($leagueId, $_SESSION['user']['id'])) {
                 SessionController::setFlashMessage('error', 'Já tens um pedido pendente para entrar nesta liga.');
                 header('Location: /error');
                 exit();
@@ -761,7 +763,8 @@ ORDER BY total_pontuacao DESC');
 
             require '../views/liga/request_join_league.php';
 
-        }elseif($_SERVER['REQUEST_METHOD'] == 'POST') {
+        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $leagueAdmin = self::getLeagueAdmin($_POST['league_id']);
             $conn = dbConnect();
             $stmt = $conn->prepare('INSERT INTO Lista_Espera (id_utilizador, id_liga, data_pedido, status, mensagem) VALUES (:user_id, :league_id, NOW(), "pendente", :message)');
             $stmt->bindParam(':user_id', $_SESSION['user']['id']);
@@ -769,17 +772,29 @@ ORDER BY total_pontuacao DESC');
             // need to sanitaze message here
             $stmt->bindParam(':message', $_POST['message']);
             $stmt->execute();
+            NotificationController::create($leagueAdmin, 'Tens novos pedidos de adesão', '/league?id=' . $_POST['league_id']);
             SessionController::setFlashMessage('success', 'Pedido enviado com sucesso!');
             header('Location: /dashboard');
-        }else {
+        } else {
             SessionController::setFlashMessage('error', 'Método não suportado.');
             header('Location: /error');
         }
 
     }
 
+    private static function getLeagueAdmin($leagueId)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT id_utilizador FROM Membros_Liga WHERE id_liga = :league_id AND admin = 1');
+        $stmt->bindParam(':league_id', $leagueId);
+        $stmt->execute();
 
-    private static function isUserPendingMemberOfLeague($leagueId, $userId) {
+        return $stmt->fetchColumn();
+    }
+
+
+    private static function isUserPendingMemberOfLeague($leagueId, $userId)
+    {
         $conn = dbConnect();
         $stmt = $conn->prepare('SELECT COUNT(*) FROM Lista_Espera WHERE id_liga = :league_id AND id_utilizador = :user_id');
         $stmt->bindParam(':league_id', $leagueId);
@@ -787,6 +802,135 @@ ORDER BY total_pontuacao DESC');
         $stmt->execute();
 
         return $stmt->fetchColumn() > 0;
+    }
+
+
+    private static function getLeagueJoinRequests($leagueId)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('
+        SELECT Lista_Espera.id, Lista_Espera.id_utilizador, Lista_Espera.id_liga, Lista_Espera.data_pedido, Lista_Espera.status, Lista_Espera.mensagem, Utilizadores.nome_utilizador, Utilizadores.email
+        FROM Lista_Espera
+        INNER JOIN Utilizadores ON Lista_Espera.id_utilizador = Utilizadores.id
+        WHERE Lista_Espera.id_liga = :league_id AND Lista_Espera.status = "pendente"
+    ');
+        $stmt->bindParam(':league_id', $leagueId);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private static function isLeagueAdmin($leagueId, $userId)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('SELECT COUNT(*) FROM Membros_Liga WHERE id_liga = :league_id AND id_utilizador = :user_id AND admin = 1');
+        $stmt->bindParam(':league_id', $leagueId);
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() > 0;
+    }
+
+    public static function acceptRequestJoinLeague()
+    {
+        SessionController::start();
+        checkLoggedIn();
+
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            SessionController::setFlashMessage('error', 'Método não suportado.');
+            header('Location: /error');
+            exit();
+        }
+        $requestId = $_POST['request_id'];
+        $leagueId = $_POST['league_id'];
+        $userId = $_POST['user_id'];
+
+        if (!self::isLeagueAdmin($leagueId, $_SESSION['user']['id'])) {
+            SessionController::setFlashMessage('error', 'Não tens permissões para aceitar pedidos de entrada nesta liga.');
+            header('Location: /error');
+            exit();
+        }
+
+        if(self::isUserMemberOfLeague($userId, $leagueId)) {
+            SessionController::setFlashMessage('error', 'O utilizador já pertence à liga.');
+            header('Location: /error');
+            exit();
+        }
+
+        if (!self::addUserToLeague($userId, $leagueId)) {
+            SessionController::setFlashMessage('error', 'Ocorreu um erro ao adicionar o utilizador à liga.');
+            header('Location: /error');
+            exit();
+        }
+
+        if (!self::addUserToRanking($userId, $leagueId)) {
+            SessionController::setFlashMessage('error', 'Ocorreu um erro ao adicionar o utilizador ao ranking.');
+            header('Location: /error');
+            exit();
+        }
+
+        if (!self::acceptFromWaitList($requestId)) {
+            SessionController::setFlashMessage('error', 'Ocorreu um erro ao aceitar o pedido.');
+            header('Location: /error');
+            exit();
+        }
+
+        NotificationController::create($userId, 'O teu pedido de adesão foi aceite', '/league?id=' . $leagueId);
+        header("Location: /league?id=$leagueId");
+
+    }
+
+    private static function acceptFromWaitList($requestID)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('
+            UPDATE Lista_Espera
+            SET status = "aceite"
+            WHERE id = :request_id
+        ');
+        $stmt->bindParam(':request_id', $requestID);
+
+        return $stmt->execute();
+    }
+
+    private static function deleteFromWaitList($requestID)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('
+            DELETE FROM Lista_Espera
+            WHERE id = :request_id
+        ');
+        $stmt->bindParam(':request_id', $requestID);
+
+        return $stmt->execute();
+    }
+
+    public static function rejectRequestJoinLeague()
+    {
+        SessionController::start();
+        checkLoggedIn();
+
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            SessionController::setFlashMessage('error', 'Método não suportado.');
+            header('Location: /error');
+            exit();
+        }
+        $requestId = $_POST['request_id'];
+        $leagueId = $_POST['league_id'];
+
+        if (!self::isLeagueAdmin($leagueId, $_SESSION['user']['id'])) {
+            SessionController::setFlashMessage('error', 'Não tens permissões para rejeitar pedidos de entrada nesta liga.');
+            header('Location: /error');
+            exit();
+        }
+
+        if (!self::deleteFromWaitList($requestId)) {
+            SessionController::setFlashMessage('error', 'Ocorreu um erro ao rejeitar o pedido.');
+            header('Location: /error');
+            exit();
+        }
+
+        header("Location: /league?id=$leagueId");
     }
 }
 
