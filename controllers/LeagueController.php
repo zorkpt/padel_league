@@ -1041,11 +1041,15 @@ ORDER BY total_pontuacao DESC');
             exit();
         }
 
+        if(!GameController::removePlayerFromGames($userId, $leagueId)){
+            SessionController::setFlashMessage('error', 'Ocorreu um erro ao sair dos jogos.');
+            header('Location: /error');
+            exit();
+        }
+
         NotificationController::create($leagueAdmin, $userInfo['nome_utilizador'] . ' saiu da liga', '/league?id=' . $leagueId);
         SessionController::setFlashMessage('success', 'Saiu da liga com sucesso.');
         header("Location: /dashboard");
-
-
     }
 
     private static function removeUserFromLeague($userId, $leagueId)
