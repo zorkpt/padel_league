@@ -13,9 +13,24 @@ class LeagueController
             $league_type = $_POST['league_type'];
             $description = $_POST['descricao'];
             $creator_id = $_SESSION['user']['id'];
-
+            if(strlen($name) > 20){
+                SessionController::setFlashMessage('league_error', 'O nome da liga não pode ter mais de 20 caracteres');
+                header('Location: /leagues/create');
+                exit();
+            }
+            if(strlen($name) < 3){
+                SessionController::setFlashMessage('league_error', 'O nome da liga não pode ter menos de 3 caracteres');
+                header('Location: /leagues/create');
+                exit();
+            }
             if (empty($name) || empty($description)) {
                 SessionController::setFlashMessage('league_error', 'Os campos não podem estar vazios');
+                header('Location: /leagues/create');
+                exit();
+            }
+
+            if(self::checkString($name) || self::checkString($description)){
+                SessionController::setFlashMessage('league_error', 'Os campos não podem conter caracteres especiais');
                 header('Location: /leagues/create');
                 exit();
             }
@@ -32,6 +47,9 @@ class LeagueController
         require_once '../views/liga/league_create.php';
     }
 
+    public static function checkString($string) {
+        return preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $string);
+    }
     private static function insertLeague($name, $description, $league_type, $creator_id, $invite_code)
     {
         $creation_date = date("Y-m-d H:i:s");
