@@ -212,8 +212,6 @@
                                 <div class="cursor-not-allowed opacity-50">Registrar Resultados</div>
                             <?php endif; ?>
 
-
-
                             <?php if ($game['status'] == GAME_LOCKED && $resultsExist): ?>
                                 <form action="/game/finish" method="POST">
                                     <input type="hidden" name="game_id" value="<?php echo $game['id']; ?>">
@@ -222,6 +220,16 @@
                                 </form>
                             <?php else: ?>
                                 <div class="cursor-not-allowed opacity-50">Terminar Jogo</div>
+                            <?php endif; ?>
+
+                            <?php if ($currentUserId == $creatorID && $game['status'] != GAME_FINISHED): ?>
+                                <button
+                                        id="triggerModal"
+                                        class="mb-4 inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-red-600 rounded shadow ripple hover:shadow-lg hover:bg-red-800 focus:outline-none"
+                                >
+                                    Cancelar Jogo
+                                </button>
+                                <input type="hidden" name="game_id" value="<?php echo $game['id']; ?>">
                             <?php endif; ?>
                         </div>
                     </div>
@@ -271,6 +279,57 @@
             </div>
         </div>
 
+
     </main>
 
+    <div id="confirmationModal" class="fixed inset-0 flex items-center justify-center z-50 invisible opacity-0 transition-all">
+        <div class="modal-content bg-white p-6 rounded shadow-lg w-1/3">
+            <p class="mb-4">Tens a certeza que queres cancelar o jogo?</p>
+            <div class="flex justify-end">
+                <button id="confirmLeave" class="bg-red-600 text-white px-4 py-2 rounded mr-2 hover:bg-red-700">Sim,
+                    cancelar
+                </button>
+                <button id="cancelLeave" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Não</button>
+            </div>
+        </div>
+    </div>
+
+
+    <form id="cancelGameForm" method="post" action="/game/cancel">
+        <input type="hidden" name="game_id" value="<?= $game['id']; ?>">
+        <input type="hidden" name="league_id" value="<?= $game['id_liga'] ?>">
+    </form>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const modal = document.getElementById('confirmationModal');
+            const confirmButton = document.getElementById('confirmLeave');
+            const cancelButton = document.getElementById('cancelLeave');
+            const leaveLeagueForm = document.getElementById('cancelGameForm');
+            const triggerModalButton = document.getElementById('triggerModal');
+
+            triggerModalButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                modal.classList.remove('invisible');
+                modal.style.opacity = 1;
+            });
+
+            // Quando o botão confirmar no modal for clicado, envia o formulário.
+            confirmButton.addEventListener('click', function () {
+                modal.classList.add('invisible');
+                leaveLeagueForm.submit();
+            });
+
+            // Quando o botão cancelar no modal for clicado, apenas fecha o modal.
+            cancelButton.addEventListener('click', function () {
+                modal.style.opacity = 0;
+                setTimeout(() => {
+                    modal.classList.add('invisible');
+                }, 300); // A duração da transição
+            });
+        });
+
+
+    </script>
     <?php require BASE_PATH . "/views/partials/footer.php"; ?>
