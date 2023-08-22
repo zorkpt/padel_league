@@ -610,5 +610,24 @@ class GameController
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result['total'];
     }
+
+    public static function cancelGame() {
+
+        $gameId = $_POST['game_id'];
+        $leagueId = $_POST['league_id'];
+
+        $conn = dbConnect();
+
+        $stmt1 = $conn->prepare("DELETE FROM Jogadores_Jogo WHERE id_jogo = :game_id");
+        $stmt1->bindParam(':game_id', $gameId);
+        $stmt1->execute();
+
+        $stmt2 = $conn->prepare("DELETE FROM Jogos WHERE id = :game_id");
+        $stmt2->bindParam(':game_id', $gameId);
+        $stmt2->execute();
+
+        SessionController::setFlashMessage('success', 'Jogo cancelado com sucesso.');
+        header("Location: /league?id=$leagueId");
+    }
 }
 

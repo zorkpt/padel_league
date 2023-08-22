@@ -224,7 +224,7 @@ extract($joinRequests);
         <input type="hidden" name="league_id" value="<?= $leagueDetails['id'] ?>">
     </form>
 
-    <script>
+        <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             const modal = document.getElementById('confirmationModal');
             const confirmButton = document.getElementById('confirmLeave');
