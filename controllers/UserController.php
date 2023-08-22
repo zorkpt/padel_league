@@ -397,8 +397,10 @@ class UserController
 
             $user_name = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            $win_loss_ratio = null;
+
             // scores
-            $stmt = $conn->prepare('SELECT jogos_jogados, jogos_ganhos FROM Ranking where id_utilizador = :id');
+            $stmt = $conn->prepare('SELECT SUM(jogos_jogados) as jogos_jogados, SUM(jogos_ganhos) as jogos_ganhos FROM Ranking where id_utilizador = :id');
             $stmt->bindParam(':id', $user_id);
             $stmt->execute();
 
@@ -408,11 +410,10 @@ class UserController
                 if ($score['jogos_jogados'] > 0) {
                     $win_loss_ratio = ($score['jogos_ganhos'] / $score['jogos_jogados']) * 100;
                 }
-            } else {
+            }else{
                 $score = [];
                 $score['jogos_ganhos'] = 0;
                 $score['jogos_jogados'] = 0;
-                $win_loss_ratio = 0;
             }
 
 
