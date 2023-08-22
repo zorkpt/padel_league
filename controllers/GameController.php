@@ -122,7 +122,7 @@ class GameController
             $players = self::getPlayersInGame($game_id);
             $playerIds = self::getPlayerIdsInGame($game_id);
             $resultsExist = self::resultsExist($game_id);
-
+            $canRegisterResults = self::canRegisterResults($players);
             require_once '../views/jogo/show.php';
         } elseif($league_type == 'privada' && !$membership) {
             SessionController::setFlashMessage('error', 'Esta Liga é Privada.');
@@ -130,6 +130,19 @@ class GameController
         }
     }
 
+    private static function canRegisterResults($players)
+    {
+        $team1 = 0;
+        $team2 = 0;
+        foreach ($players as $player) {
+            if ($player['equipa'] == 1) {
+                $team1++;
+            } elseif ($player['equipa'] == 2) {
+                $team2++;
+            }
+        }
+        return ($team1 == 2 && $team2 == 2);
+    }
     public static function getGameData($game_id)
     {
         $conn = dbConnect();
@@ -400,13 +413,13 @@ class GameController
     {
         $conn = dbConnect();
         $stmt = $conn->prepare('
-    SELECT Jogadores_Jogo.id_utilizador, Ranking.pontos 
-    FROM Jogadores_Jogo
-    LEFT JOIN Ranking 
-    ON Jogadores_Jogo.id_utilizador = Ranking.id_utilizador
-    AND Ranking.id_liga = (SELECT id_liga FROM Jogos WHERE id = :game_id) 
-    WHERE Jogadores_Jogo.id_jogo = :game_id
-    ORDER BY Ranking.pontos DESC
+        SELECT Jogadores_Jogo.id_utilizador, Ranking.pontos 
+        FROM Jogadores_Jogo
+        LEFT JOIN Ranking 
+        ON Jogadores_Jogo.id_utilizador = Ranking.id_utilizador
+        AND Ranking.id_liga = (SELECT id_liga FROM Jogos WHERE id = :game_id) 
+        WHERE Jogadores_Jogo.id_jogo = :game_id
+        ORDER BY Ranking.pontos DESC
 ');
         $stmt->bindParam(':game_id', $game_id);
         $stmt->execute();

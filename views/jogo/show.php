@@ -203,8 +203,7 @@
                                    class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Alterar
                                     Equipas</a>
                             <?php endif; ?>
-
-                            <?php if ($game['status'] == GAME_LOCKED && $game['fim_jogo'] == 0): ?>
+                            <?php if ($game['status'] == GAME_LOCKED && $game['fim_jogo'] == GAME_FINISHED && $canRegisterResults): ?>
                                 <a href="/game/register_results?id=<?php echo $game['id']; ?>"
                                    class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Registrar
                                     Resultados</a>
@@ -271,6 +270,10 @@
                                         <!-- adicionar mb-4 -->
                                     </form>
                                 <?php endif; ?>
+                            <?php else: ?>
+                            <div class="bg-gray-100 p-4 rounded-md text-gray-700">
+                                <p>Apenas o criador do jogo pode fazer alterações às equipas.</p>
+                            </div>
                             <?php endif; ?>
                         </div>
                     </div>
