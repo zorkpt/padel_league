@@ -229,6 +229,15 @@ class GameController
         header('Location: /game?id=' . $game_id);
     }
 
+    public static function removePlayerFromGames($userId, $leagueId, $status = GAME_OPEN)
+    {
+        $conn = dbConnect();
+        $stmt = $conn->prepare('DELETE FROM Jogadores_Jogo WHERE id_utilizador = :user_id AND id_jogo IN (SELECT id FROM Jogos WHERE id_liga = :league_id AND status = :status)');
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->bindParam(':league_id', $leagueId);
+        $stmt->bindParam(':status', $status);
+        return $stmt->execute();
+    }
 
     public static function handleLockGame()
     {
